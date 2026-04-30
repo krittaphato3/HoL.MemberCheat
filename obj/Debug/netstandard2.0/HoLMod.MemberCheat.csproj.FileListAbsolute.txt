@@ -1,0 +1,11 @@
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\bin\Debug\netstandard2.0\HoLMod.MemberCheat.deps.json
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\bin\Debug\netstandard2.0\HoLMod.MemberCheat.dll
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\bin\Debug\netstandard2.0\HoLMod.MemberCheat.pdb
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\obj\Debug\netstandard2.0\HoLMod.MemberCheat.csproj.AssemblyReference.cache
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\obj\Debug\netstandard2.0\PluginInfo.cs
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\obj\Debug\netstandard2.0\HoLMod.MemberCheat.GeneratedMSBuildEditorConfig.editorconfig
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\obj\Debug\netstandard2.0\HoLMod.MemberCheat.AssemblyInfoInputs.cache
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\obj\Debug\netstandard2.0\HoLMod.MemberCheat.AssemblyInfo.cs
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\obj\Debug\netstandard2.0\HoLMod.MemberCheat.csproj.CoreCompileInputs.cache
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\obj\Debug\netstandard2.0\HoLMod.MemberCheat.dll
+D:\Library\Project\Outside\HouseOfLegacyMod\HoLMod.MemberCheat\obj\Debug\netstandard2.0\HoLMod.MemberCheat.pdb
