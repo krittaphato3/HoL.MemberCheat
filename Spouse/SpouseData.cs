@@ -31,8 +31,8 @@ namespace HoLMod.MemberCheat.Spouse
         public const int IDX_STAMINA = 20;
         public const int IDX_SKILL_POINTS = 23;
         public const int IDX_PREGNANCY_PROB = 24;
-        public const int IDX_TRAITS = 26;
-        public const int IDX_OFFICIAL_POS = 30;
+        public const int IDX_UNK_27 = 27;   // unknown field (Data_B[7])
+        public const int IDX_OFFICIAL_POS = 30;   // some spouses can hold rank
         public const int IDX_MARITAL_HARMONY = 31;
         public const int IDX_CLAN_DUTY = 32;
 

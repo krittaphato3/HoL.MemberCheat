@@ -70,6 +70,8 @@ namespace HoLMod.MemberCheat.WarEvent
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             warEvents = WarEventData.GetWarEvents();
             selectedIndex = -1;
         }

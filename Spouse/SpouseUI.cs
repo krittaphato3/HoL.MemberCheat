@@ -70,8 +70,14 @@ namespace HoLMod.MemberCheat.Spouse
                     DrawStatusEditor(member);
                 if (member.Count > SpouseData.IDX_PREGNANCY)
                     DrawPregnancyEditor(member);
-                if (member.Count > SpouseData.IDX_TRAITS)
-                    DrawTraitsEditor(member);
+                // Traits editor removed due to missing IDX_TRAITS in SpouseData
+
+                // --- Extra missing fields ---
+                DrawIntFieldSection("Status Duration", member, SpouseData.IDX_STATUS_DURATION);
+                DrawInternalDataSection("Equipment", member, SpouseData.IDX_EQUIPMENT);
+                DrawInternalDataSection("Recent Events", member, SpouseData.IDX_RECENT_EVENTS);
+                DrawInternalDataSection("Official Pos", member, SpouseData.IDX_OFFICIAL_POS);
+                DrawIntFieldSection("Unknown (27)", member, SpouseData.IDX_UNK_27);
 
                 DrawDanger();
                 GUILayout.EndScrollView();
@@ -164,13 +170,11 @@ namespace HoLMod.MemberCheat.Spouse
             int.TryParse(SpouseData.GetCompositeSub(member, SpouseData.SUB_PERSONALITY), out int currPers);
             string persLabel = ClanData.PersonalityOptions.ContainsKey(currPers) ? ClanData.PersonalityOptions[currPers] : "?";
             GUILayout.Label($"Current: {persLabel}");
-            GUILayout.BeginHorizontal();
             for (int i = 0; i < 8; i++)
             {
                 var opt = ClanData.PersonalityOptions.ElementAt(i);
                 if (GUILayout.Button(opt.Value)) { SpouseData.SetCompositeSub(member, SpouseData.SUB_PERSONALITY, opt.Key.ToString()); Apply(); }
             }
-            GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             for (int i = 8; i < ClanData.PersonalityOptions.Count; i++)
             {
@@ -274,22 +278,26 @@ namespace HoLMod.MemberCheat.Spouse
             GUILayout.EndHorizontal();
         }
 
-        private static void DrawTraitsEditor(List<string> member)
+        // --- Extra missing fields ---
+        private static void DrawInternalDataSection(string label, List<string> member, int idx)
         {
-            GUILayout.Label("--- Traits ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
-            int idx = SpouseData.IDX_TRAITS;
-            string traits = member[idx];
-            GUILayout.Label($"Current: {(traits == "null" ? "None" : traits)}");
+            if (idx >= member.Count) return;
+            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Prodigy")) { member[idx] = "4@-1"; Apply(); }
-            if (GUILayout.Button("Noble")) { member[idx] = "5@-1"; Apply(); }
-            if (GUILayout.Button("Tireless")) { member[idx] = "18@-1"; Apply(); }
-            if (GUILayout.Button("Remove All")) { member[idx] = "null"; Apply(); }
+            GUILayout.Label($"{label}:", GUILayout.Width(120));
+            string val = GUILayout.TextField(member[idx], GUILayout.Width(300));
+            if (val != member[idx]) { member[idx] = val; Apply(); }
             GUILayout.EndHorizontal();
+        }
+
+        private static void DrawIntFieldSection(string label, List<string> member, int idx)
+        {
+            if (idx >= member.Count) return;
+            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
             GUILayout.BeginHorizontal();
-            GUILayout.Label("Edit:", GUILayout.Width(40));
-            string newTraits = GUILayout.TextField(traits, GUILayout.Width(200));
-            if (newTraits != traits) { member[idx] = newTraits; Apply(); }
+            GUILayout.Label($"{label}:", GUILayout.Width(120));
+            string val = GUILayout.TextField(member[idx], GUILayout.Width(60));
+            if (val != member[idx] && int.TryParse(val, out int iVal)) { member[idx] = iVal.ToString(); Apply(); }
             GUILayout.EndHorizontal();
         }
 
@@ -376,6 +384,8 @@ namespace HoLMod.MemberCheat.Spouse
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             list = SpouseData.GetList();
             allNames = new string[list?.Count ?? 0];
             for (int i = 0; i < allNames.Length; i++)

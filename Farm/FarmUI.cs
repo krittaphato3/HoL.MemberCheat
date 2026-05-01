@@ -63,18 +63,20 @@ namespace HoLMod.MemberCheat.Farm
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
             string[] labels = {
-                "Ownership", "Line1", "Fertility", "Line3", "Location",
-                "Size (acres)", "Name", "Population", "Line8", "Line9",
-                "Environment", "Security", "Convenience", "Line13", "Production",
-                "Line15", "Manager Key", "Line17", "Line18", "Young Trees 2yr",
-                "Line20", "Young Trees 4yr", "Young Trees 5yr", "Line23", "Workers Total",
-                "Line25", "Idle Workers"
+                "Ownership", null, "Fertility", null, "Location",
+                "Size (acres)", "Name", "Population", null, null,
+                "Environment", "Security", "Convenience", null, "Production",
+                null, "Manager Key", null, null, "Young Trees 2yr",
+                null, "Young Trees 4yr", "Young Trees 5yr", null, "Workers Total",
+                null, "Idle Workers"
             };
 
-            for (int i = 0; i < farm.Count && i < labels.Length; i++)
+            for (int i = 0; i < farm.Count; i++)
             {
+                string label = (i < labels.Length) ? labels[i] : null;
+                if (label == null) continue;
                 GUILayout.BeginHorizontal();
-                GUILayout.Label($"{labels[i]}:", GUILayout.Width(120));
+                GUILayout.Label($"{label}:", GUILayout.Width(120));
                 string val = GUILayout.TextField(farm[i], GUILayout.Width(120));
                 if (val != farm[i]) farm[i] = val;
                 GUILayout.EndHorizontal();
@@ -85,6 +87,8 @@ namespace HoLMod.MemberCheat.Farm
 
         private static void Refresh()
         {
+            scrollFarm = Vector2.zero;
+            scrollEdit = Vector2.zero;
             allFarms = FarmData.GetFarmList();
             flatFarms.Clear();
             for (int r = 0; r < allFarms.Count; r++)

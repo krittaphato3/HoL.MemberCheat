@@ -122,6 +122,18 @@ namespace HoLMod.MemberCheat.ClanMember
                 if (member.Count > ClanMemberData.IDX_STUDY_SCHOOL)
                     DrawStudySchoolEditor(member);
 
+                // --- EXTRA INTERNAL DATA SECTIONS ---
+                DrawInternalDataSection("Appearance", member, ClanMemberData.IDX_APPEARANCE);
+                DrawInternalDataSection("Children IDs", member, ClanMemberData.IDX_CHILD_IDS);
+                DrawInternalDataSection("Estate / School", member, ClanMemberData.IDX_ESTATE);
+                DrawIntFieldSection("Status Duration", member, ClanMemberData.IDX_STATUS_DURATION);
+                DrawIntFieldSection("Book Progress", member, ClanMemberData.IDX_BOOK_PROGRESS);
+                DrawInternalDataSection("Recent Events", member, ClanMemberData.IDX_RECENT_EVENTS);
+                DrawInternalDataSection("Basic Stat Gain", member, ClanMemberData.IDX_BASIC_STAT_GAIN);
+                DrawInternalDataSection("School Values", member, ClanMemberData.IDX_SCHOOL_VALUES);
+                DrawIntFieldSection("Preg. Cooldown", member, ClanMemberData.IDX_PREGNANCY_COOLDOWN);
+                DrawLongTextField("Biography", member, ClanMemberData.IDX_BIOGRAPHY);
+
                 DrawRankEditor(member);
                 GUILayout.EndScrollView();
 
@@ -240,10 +252,11 @@ namespace HoLMod.MemberCheat.ClanMember
             var zhiZeData = ClanMemberData.GetZhiZeData_ZhangMu();
             if (zhiZeData != null)
             {
-                string[] zhiZeLabels = { "Auto‑Purchase", "Social", "Entertainment", "Trade", "Line4", "Line5", "Line6", "Line7", "Line8", "Line9" };
+                string[] zhiZeLabels = { "Auto‑Purchase", "Social", "Entertainment", "Trade", null, null, null, null, null, null };
                 for (int i = 0; i < zhiZeData.Count; i++)
                 {
-                    string label = i < zhiZeLabels.Length ? zhiZeLabels[i] : $"Index {i}";
+                    if (i >= zhiZeLabels.Length || zhiZeLabels[i] == null) continue;
+                    string label = zhiZeLabels[i];
                     GUILayout.BeginHorizontal();
                     GUILayout.Label($"{label}:", GUILayout.Width(110));
                     string val = GUILayout.TextField(zhiZeData[i], GUILayout.Width(200));
@@ -257,10 +270,11 @@ namespace HoLMod.MemberCheat.ClanMember
             var perData = ClanMemberData.GetPerData();
             if (perData != null)
             {
-                string[] perLabels = { "Vassal Tax", "Land Tax", "Line2", "Line3", "Line4", "Line5", "Line6", "Line7", "Line8", "Line9" };
+                string[] perLabels = { "Vassal Tax", "Land Tax", null, null, null, null, null, null, null, null };
                 for (int i = 0; i < perData.Count; i++)
                 {
-                    string label = i < perLabels.Length ? perLabels[i] : $"Index {i}";
+                    if (i >= perLabels.Length || perLabels[i] == null) continue;
+                    string label = perLabels[i];
                     GUILayout.BeginHorizontal();
                     GUILayout.Label($"{label}:", GUILayout.Width(110));
                     string val = GUILayout.TextField(perData[i], GUILayout.Width(200));
@@ -275,6 +289,8 @@ namespace HoLMod.MemberCheat.ClanMember
         // ===================== MEMBER EDITOR =====================
         private static void Refresh()
         {
+            scrollMember = Vector2.zero;
+            scrollEditor = Vector2.zero;
             memberList = ClanMemberData.GetMemberList(currentSubCategory);
             BuildMemberNames();
         }
@@ -442,7 +458,6 @@ namespace HoLMod.MemberCheat.ClanMember
                 string label = ClanMemberData.MainStats.ContainsKey(idx) ? ClanMemberData.MainStats[idx] : $"Attr {idx}";
                 string valStr = member[idx];
 
-                // Convert ALL float stats to integer for display
                 if (float.TryParse(valStr, out float fv))
                     valStr = ((int)fv).ToString();
 
@@ -593,6 +608,40 @@ namespace HoLMod.MemberCheat.ClanMember
             GUILayout.Label($"School: {currLabel}", GUILayout.Width(120));
             foreach (var opt in ClanMemberData.StudySchools)
                 if (GUILayout.Button(opt.Value)) { member[idx] = opt.Key.ToString(); ApplyChanges(); }
+            GUILayout.EndHorizontal();
+        }
+
+        // --- EXTRA INTERNAL DATA SECTIONS ---
+        private static void DrawInternalDataSection(string label, List<string> member, int idx)
+        {
+            if (idx >= member.Count) return;
+            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"{label}:", GUILayout.Width(100));
+            string val = GUILayout.TextField(member[idx], GUILayout.Width(300));
+            if (val != member[idx]) { member[idx] = val; ApplyChanges(); }
+            GUILayout.EndHorizontal();
+        }
+
+        private static void DrawIntFieldSection(string label, List<string> member, int idx)
+        {
+            if (idx >= member.Count) return;
+            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"{label}:", GUILayout.Width(100));
+            string val = GUILayout.TextField(member[idx], GUILayout.Width(60));
+            if (val != member[idx] && int.TryParse(val, out int iVal)) { member[idx] = iVal.ToString(); ApplyChanges(); }
+            GUILayout.EndHorizontal();
+        }
+
+        private static void DrawLongTextField(string label, List<string> member, int idx)
+        {
+            if (idx >= member.Count) return;
+            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"{label}:", GUILayout.Width(100));
+            string val = GUILayout.TextField(member[idx], GUILayout.Width(300));
+            if (val != member[idx]) { member[idx] = val; ApplyChanges(); }
             GUILayout.EndHorizontal();
         }
 

@@ -70,6 +70,8 @@ namespace HoLMod.MemberCheat.Fief
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             fiefs = FiefData.GetFiefs();
             selectedIndex = -1;
         }

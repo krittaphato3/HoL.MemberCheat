@@ -64,6 +64,8 @@ namespace HoLMod.MemberCheat.AttackPrefecture
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             prefectureIDs = AttackPrefectureData.GetAttackPrefectures();
             selectedIndex = -1;
         }

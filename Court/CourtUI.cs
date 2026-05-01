@@ -70,6 +70,8 @@ namespace HoLMod.MemberCheat.Court
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             ministers = CourtData.GetMinisters();
             selectedIndex = -1;
         }

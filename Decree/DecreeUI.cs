@@ -70,6 +70,8 @@ namespace HoLMod.MemberCheat.Decree
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             decrees = DecreeData.GetDecrees();
             selectedIndex = -1;
         }

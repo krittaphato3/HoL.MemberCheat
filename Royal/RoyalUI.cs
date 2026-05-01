@@ -324,6 +324,8 @@ namespace HoLMod.MemberCheat.Royal
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             members = RoyalData.GetMembers();
             spouses = RoyalData.GetSpouses();
             selectedIndex = -1;

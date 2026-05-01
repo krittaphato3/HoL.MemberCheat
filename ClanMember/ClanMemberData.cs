@@ -7,6 +7,9 @@ namespace HoLMod.MemberCheat.ClanMember
 {
     public static class ClanMemberData
     {
+        public const int IDX_APPEARANCE = 1;
+        public const int IDX_CHILD_IDS = 2;
+        public const int IDX_ESTATE = 3;
         public const int IDX_COMPOSITE = 4;
         public const int IDX_PERSONALITY = 5;
         public const int IDX_AGE = 6;
@@ -20,16 +23,21 @@ namespace HoLMod.MemberCheat.ClanMember
         public const int IDX_STATUS = 15;
         public const int IDX_RENOWN = 16;
         public const int IDX_STATUS_DURATION = 18;
+        public const int IDX_BOOK_PROGRESS = 19;
         public const int IDX_HEALTH = 20;
         public const int IDX_CHARISMA = 21;
         public const int IDX_CLAN_LEADER = 22;
         public const int IDX_TRAITS = 23;
+        public const int IDX_RECENT_EVENTS = 24;
         public const int IDX_PREGNANCY = 25;
         public const int IDX_MARRIAGE = 26;
         public const int IDX_CUNNING = 27;
         public const int IDX_STAMINA = 30;
+        public const int IDX_BASIC_STAT_GAIN = 31;
+        public const int IDX_SCHOOL_VALUES = 32;
         public const int IDX_SKILL_VALUE = 33;
         public const int IDX_PREGNANCY_COOLDOWN = 34;
+        public const int IDX_BIOGRAPHY = 36;
         public const int IDX_STUDY_SCHOOL = 40;
         public const int IDX_CLAN_DUTY = 41;
 
@@ -59,7 +67,6 @@ namespace HoLMod.MemberCheat.ClanMember
         public static readonly Dictionary<int, string> HobbyOptions = new Dictionary<int, string> { { 0, "Rouge" }, { 1, "Ink" }, { 2, "Art" }, { 3, "Antique" }, { 4, "Tea Set" }, { 5, "Incense" }, { 6, "Vase" }, { 7, "Wine" }, { 8, "Music" }, { 9, "Pelt" } };
         public static readonly Dictionary<int, string> PersonalityOptions = new Dictionary<int, string> { { 0, "Unclear" }, { 1, "Proud" }, { 2, "Righteous" }, { 3, "Lively" }, { 4, "Kind" }, { 5, "Honest" }, { 6, "Carefree" }, { 7, "Cold" }, { 8, "Insecure" }, { 9, "Timid" }, { 10, "Shy" }, { 11, "Mean" }, { 12, "Fickle" }, { 13, "Gloomy" }, { 14, "Paranoid" } };
 
-        // New option dictionaries
         public static readonly Dictionary<int, string> StatusOptions = new Dictionary<int, string>
         {
             {0, "Available"}, {1, "Demoted"}, {2, "Study Tour"}, {3, "Caning"}, {4, "Imprisoned"},
@@ -109,7 +116,6 @@ namespace HoLMod.MemberCheat.ClanMember
             typeof(Mainload).GetMethod("ReadSetData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)?.Invoke(null, null);
         }
 
-        // Family Data accessors
         public static List<string> GetFamilyData()
         {
             var field = typeof(Mainload).GetField("FamilyData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);

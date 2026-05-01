@@ -78,6 +78,8 @@ namespace HoLMod.MemberCheat.City
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             allCities = CityData.GetCities();
             flatCities.Clear();
             for (int p = 0; p < allCities.Count; p++)

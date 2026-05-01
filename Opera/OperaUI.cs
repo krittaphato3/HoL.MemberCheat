@@ -3,11 +3,11 @@ using System.Linq;
 using UnityEngine;
 using YuanAPI;
 
-namespace HoLMod.MemberCheat.Mine
+namespace HoLMod.MemberCheat.Opera
 {
-    public static class MineUI
+    public static class OperaUI
     {
-        private static List<List<string>> mines;
+        private static List<List<string>> operas;
         private static int selectedIndex = -1;
         private static Vector2 scrollList, scrollEdit;
         private static bool needsRefresh = true;
@@ -18,9 +18,9 @@ namespace HoLMod.MemberCheat.Mine
         public static void Draw()
         {
             if (needsRefresh) { Refresh(); needsRefresh = false; }
-            if (mines == null) return;
+            if (operas == null) return;
 
-            GUILayout.Label($"Mines ({mines.Count})", GUI.skin.box);
+            GUILayout.Label($"Opera / Drama ({operas.Count})", GUI.skin.box);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Search:", GUILayout.Width(50));
@@ -29,39 +29,44 @@ namespace HoLMod.MemberCheat.Mine
             GUILayout.EndHorizontal();
 
             var filtered = string.IsNullOrEmpty(searchText)
-                ? mines.Select((m, i) => new { m, i }).ToList()
-                : mines.Select((m, i) => new { m, i }).Where(x => MineData.GetMineName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                ? operas.Select((m, i) => new { m, i }).ToList()
+                : operas.Select((m, i) => new { m, i }).Where(x => OperaData.GetOperaName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
             {
                 var item = filtered[j];
-                string name = MineData.GetMineName(item.m);
+                string name = OperaData.GetOperaName(item.m);
                 if (GUILayout.Button($"{item.i}: {name}"))
                     selectedIndex = item.i;
             }
             GUILayout.EndScrollView();
 
-            if (selectedIndex >= 0 && selectedIndex < mines.Count)
+            if (selectedIndex >= 0 && selectedIndex < operas.Count)
             {
-                var mine = mines[selectedIndex];
-                DrawMineEdit(mine);
+                var opera = operas[selectedIndex];
+                DrawOperaEdit(opera);
             }
         }
 
-        private static void DrawMineEdit(List<string> mine)
+        private static void DrawOperaEdit(List<string> opera)
         {
-            string name = MineData.GetMineName(mine);
-            GUILayout.Label($"Mine: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            string name = OperaData.GetOperaName(opera);
+            GUILayout.Label($"Opera: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
-            for (int i = 0; i < mine.Count; i++)
+            for (int i = 0; i < opera.Count; i++)
             {
+                string val = opera[i];
+                string displayVal = val;
+                if (float.TryParse(val, out float fv))
+                    displayVal = Mathf.RoundToInt(fv).ToString();
+
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(mine[i], GUILayout.Width(200));
-                if (val != mine[i]) mine[i] = val;
+                string newVal = GUILayout.TextField(displayVal, GUILayout.Width(120));
+                if (newVal != displayVal) opera[i] = newVal;
                 GUILayout.EndHorizontal();
             }
 
@@ -72,7 +77,7 @@ namespace HoLMod.MemberCheat.Mine
         {
             scrollList = Vector2.zero;
             scrollEdit = Vector2.zero;
-            mines = MineData.GetMines();
+            operas = OperaData.GetOperas();
             selectedIndex = -1;
         }
     }

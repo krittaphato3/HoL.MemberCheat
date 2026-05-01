@@ -70,6 +70,8 @@ namespace HoLMod.MemberCheat.Camp
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             camps = CampData.GetCamps();
             selectedIndex = -1;
         }

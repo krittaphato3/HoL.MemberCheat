@@ -1,13 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using YuanAPI;
 
-namespace HoLMod.MemberCheat.Mine
+namespace HoLMod.MemberCheat.HanMen
 {
-    public static class MineUI
+    public static class HanMenUI
     {
-        private static List<List<string>> mines;
+        private static List<List<string>> members;
         private static int selectedIndex = -1;
         private static Vector2 scrollList, scrollEdit;
         private static bool needsRefresh = true;
@@ -18,9 +19,9 @@ namespace HoLMod.MemberCheat.Mine
         public static void Draw()
         {
             if (needsRefresh) { Refresh(); needsRefresh = false; }
-            if (mines == null) return;
+            if (members == null) return;
 
-            GUILayout.Label($"Mines ({mines.Count})", GUI.skin.box);
+            GUILayout.Label($"Civilians (HanMen) ({members.Count})", GUI.skin.box);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Search:", GUILayout.Width(50));
@@ -29,39 +30,46 @@ namespace HoLMod.MemberCheat.Mine
             GUILayout.EndHorizontal();
 
             var filtered = string.IsNullOrEmpty(searchText)
-                ? mines.Select((m, i) => new { m, i }).ToList()
-                : mines.Select((m, i) => new { m, i }).Where(x => MineData.GetMineName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                ? members.Select((m, i) => new { m, i }).ToList()
+                : members.Select((m, i) => new { m, i }).Where(x => HanMenData.GetName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
             {
                 var item = filtered[j];
-                string name = MineData.GetMineName(item.m);
-                if (GUILayout.Button($"{item.i}: {name}"))
+                string name = HanMenData.GetName(item.m);
+                int age = HanMenData.GetAge(item.m);
+                if (GUILayout.Button($"{item.i}: {name} (Age {age})"))
                     selectedIndex = item.i;
             }
             GUILayout.EndScrollView();
 
-            if (selectedIndex >= 0 && selectedIndex < mines.Count)
+            if (selectedIndex >= 0 && selectedIndex < members.Count)
             {
-                var mine = mines[selectedIndex];
-                DrawMineEdit(mine);
+                var member = members[selectedIndex];
+                DrawMemberEdit(member);
             }
         }
 
-        private static void DrawMineEdit(List<string> mine)
+        private static void DrawMemberEdit(List<string> member)
         {
-            string name = MineData.GetMineName(mine);
-            GUILayout.Label($"Mine: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            string name = HanMenData.GetName(member);
+            int age = HanMenData.GetAge(member);
+            GUILayout.Label($"Editing: {name} (Age {age})", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
-            for (int i = 0; i < mine.Count; i++)
+            for (int i = 0; i < member.Count; i++)
             {
+                string val = member[i];
+                string intVal = val;
+                if (float.TryParse(val, out float fv))
+                    intVal = Mathf.RoundToInt(fv).ToString();
+
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(mine[i], GUILayout.Width(200));
-                if (val != mine[i]) mine[i] = val;
+                string newVal = GUILayout.TextField(intVal, GUILayout.Width(120));
+                if (newVal != intVal) member[i] = newVal;
                 GUILayout.EndHorizontal();
             }
 
@@ -72,7 +80,7 @@ namespace HoLMod.MemberCheat.Mine
         {
             scrollList = Vector2.zero;
             scrollEdit = Vector2.zero;
-            mines = MineData.GetMines();
+            members = HanMenData.GetMembers();
             selectedIndex = -1;
         }
     }

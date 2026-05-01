@@ -345,6 +345,9 @@ namespace HoLMod.MemberCheat.ShiJia
 
         private static void Refresh()
         {
+            scrollClan = Vector2.zero;
+            scrollMem = Vector2.zero;
+            scrollEdit = Vector2.zero;
             clanList = ShiJiaData.GetClanList();
             selectedClan = -1;
             selectedMember = -1;

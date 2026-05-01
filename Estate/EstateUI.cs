@@ -70,6 +70,8 @@ namespace HoLMod.MemberCheat.Estate
 
         private static void Refresh()
         {
+            scrollList = Vector2.zero;
+            scrollEdit = Vector2.zero;
             estates = EstateData.GetEstates();
             selectedIndex = -1;
         }
