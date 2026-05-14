@@ -21,16 +21,12 @@ namespace HoLMod.MemberCheat.Estate
             if (estates == null) return;
 
             GUILayout.Label($"Estates ({estates.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? estates.Select((m, i) => new { m, i }).ToList()
-                : estates.Select((m, i) => new { m, i }).Where(x => EstateData.GetEstateName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                : estates.Select((m, i) => new { m, i })
+                    .Where(x => EstateData.GetEstateName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
@@ -52,7 +48,7 @@ namespace HoLMod.MemberCheat.Estate
         private static void DrawEstateEdit(List<string> estate)
         {
             string name = EstateData.GetEstateName(estate);
-            GUILayout.Label($"Estate: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Estate: {name}", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
@@ -60,8 +56,12 @@ namespace HoLMod.MemberCheat.Estate
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(estate[i], GUILayout.Width(200));
-                if (val != estate[i]) estate[i] = val;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(estate[i]), GUILayout.Width(200));
+                if (val != estate[i])
+                {
+                    estate[i] = val;
+                    EstateData.SetEstates(estates);
+                }
                 GUILayout.EndHorizontal();
             }
 

@@ -21,16 +21,12 @@ namespace HoLMod.MemberCheat.Opera
             if (operas == null) return;
 
             GUILayout.Label($"Opera / Drama ({operas.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? operas.Select((m, i) => new { m, i }).ToList()
-                : operas.Select((m, i) => new { m, i }).Where(x => OperaData.GetOperaName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                : operas.Select((m, i) => new { m, i })
+                    .Where(x => OperaData.GetOperaName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
@@ -52,21 +48,20 @@ namespace HoLMod.MemberCheat.Opera
         private static void DrawOperaEdit(List<string> opera)
         {
             string name = OperaData.GetOperaName(opera);
-            GUILayout.Label($"Opera: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Opera: {name}", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
             for (int i = 0; i < opera.Count; i++)
             {
-                string val = opera[i];
-                string displayVal = val;
-                if (float.TryParse(val, out float fv))
-                    displayVal = Mathf.RoundToInt(fv).ToString();
-
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string newVal = GUILayout.TextField(displayVal, GUILayout.Width(120));
-                if (newVal != displayVal) opera[i] = newVal;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(opera[i]), GUILayout.Width(200));
+                if (val != opera[i])
+                {
+                    opera[i] = val;
+                    OperaData.SetOperas(operas);
+                }
                 GUILayout.EndHorizontal();
             }
 

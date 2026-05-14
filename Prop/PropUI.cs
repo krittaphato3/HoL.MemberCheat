@@ -21,16 +21,12 @@ namespace HoLMod.MemberCheat.Prop
             if (props == null) return;
 
             GUILayout.Label($"Items / Props ({props.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? props.Select((m, i) => new { m, i }).ToList()
-                : props.Select((m, i) => new { m, i }).Where(x => PropData.GetPropName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                : props.Select((m, i) => new { m, i })
+                    .Where(x => PropData.GetPropName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
@@ -52,21 +48,20 @@ namespace HoLMod.MemberCheat.Prop
         private static void DrawPropEdit(List<string> prop)
         {
             string name = PropData.GetPropName(prop);
-            GUILayout.Label($"Item: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Item: {name}", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
             for (int i = 0; i < prop.Count; i++)
             {
-                string val = prop[i];
-                string displayVal = val;
-                if (float.TryParse(val, out float fv))
-                    displayVal = Mathf.RoundToInt(fv).ToString();
-
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string newVal = GUILayout.TextField(displayVal, GUILayout.Width(120));
-                if (newVal != displayVal) prop[i] = newVal;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(prop[i]), GUILayout.Width(200));
+                if (val != prop[i])
+                {
+                    prop[i] = val;
+                    PropData.SetProps(props);
+                }
                 GUILayout.EndHorizontal();
             }
 

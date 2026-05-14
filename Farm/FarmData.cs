@@ -1,14 +1,24 @@
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace HoLMod.MemberCheat.Farm
 {
     public static class FarmData
     {
+        private const string FieldName = "NongZ_now";
+
         public static List<List<List<string>>> GetFarmList()
         {
-            var field = typeof(Mainload).GetField("NongZ_now", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            var field = typeof(Mainload).GetField(FieldName,
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             return (field?.GetValue(null) as List<List<List<string>>>) ?? new List<List<List<string>>>();
+        }
+
+        public static void SetFarmList(List<List<List<string>>> data)
+        {
+            var field = typeof(Mainload).GetField(FieldName,
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            field?.SetValue(null, data);
+            UIHelpers.InvokeReadSetData();
         }
 
         public static string GetFarmName(List<string> farm)
@@ -25,12 +35,7 @@ namespace HoLMod.MemberCheat.Farm
         {
             if (regionIndex == 0)
                 return farm.Count > 0 && farm[0] == "-1";
-            return true; // Fief farms are player-owned
-        }
-
-        public static string GetFarmLocation(List<string> farm)
-        {
-            return farm.Count > 4 ? farm[4] : "?";
+            return true;
         }
     }
 }

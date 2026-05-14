@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -20,7 +19,6 @@ namespace HoLMod.MemberCheat.Retainer
         public const int IDX_TEACHING = 9;
         public const int IDX_STATUS = 10;
         public const int IDX_RENOWN = 11;
-        public const int IDX_UNKNOWN_12 = 12;
         public const int IDX_CHARISMA = 13;
         public const int IDX_HEALTH = 14;
         public const int IDX_CUNNING = 15;
@@ -28,7 +26,6 @@ namespace HoLMod.MemberCheat.Retainer
         public const int IDX_PREGNANCY = 17;
         public const int IDX_SALARY = 18;
         public const int IDX_STAMINA = 19;
-        public const int IDX_UNKNOWN_20 = 20;
         public const int IDX_SPECIAL_TAG = 21;
 
         public const int SUB_NAME = 0;
@@ -40,17 +37,25 @@ namespace HoLMod.MemberCheat.Retainer
         public const int SUB_LUCK = 7;
         public const int SUB_PERSONALITY = 8;
 
+        public static readonly Dictionary<int, string> FieldLabels = new Dictionary<int, string>
+        {
+            {IDX_ID, "ID"}, {IDX_APPEARANCE, "Appearance"}, {IDX_AGE, "Age"},
+            {IDX_WRITING, "Writing"}, {IDX_MIGHT, "Might"}, {IDX_BUSINESS, "Business"},
+            {IDX_ARTS, "Arts"}, {IDX_MOOD, "Mood"}, {IDX_TEACHING, "Teaching"},
+            {IDX_STATUS, "Status"}, {IDX_RENOWN, "Renown"}, {IDX_CHARISMA, "Charisma"},
+            {IDX_HEALTH, "Health"}, {IDX_CUNNING, "Cunning"}, {IDX_SKILL_POINTS, "Skill Points"},
+            {IDX_PREGNANCY, "Pregnancy"}, {IDX_SALARY, "Salary"}, {IDX_STAMINA, "Stamina"},
+            {IDX_SPECIAL_TAG, "Special Tag"}
+        };
+
         public static List<List<string>> GetList()
         {
-            var field = typeof(Mainload).GetField(Category, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(Category);
         }
 
         public static void SetList(List<List<string>> list)
         {
-            var field = typeof(Mainload).GetField(Category, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            field?.SetValue(null, list);
-            typeof(Mainload).GetMethod("ReadSetData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)?.Invoke(null, null);
+            UIHelpers.WriteBackSetData(list, Category);
         }
 
         public static string[] GetCompositeParts(List<string> member)

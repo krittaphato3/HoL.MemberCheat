@@ -21,16 +21,12 @@ namespace HoLMod.MemberCheat.Decree
             if (decrees == null) return;
 
             GUILayout.Label($"Imperial Decrees ({decrees.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? decrees.Select((m, i) => new { m, i }).ToList()
-                : decrees.Select((m, i) => new { m, i }).Where(x => DecreeData.GetDecreeName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                : decrees.Select((m, i) => new { m, i })
+                    .Where(x => DecreeData.GetDecreeName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
@@ -52,7 +48,7 @@ namespace HoLMod.MemberCheat.Decree
         private static void DrawDecreeEdit(List<string> decree)
         {
             string name = DecreeData.GetDecreeName(decree);
-            GUILayout.Label($"Editing: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Editing: {name}", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
@@ -60,8 +56,12 @@ namespace HoLMod.MemberCheat.Decree
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(decree[i], GUILayout.Width(200));
-                if (val != decree[i]) decree[i] = val;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(decree[i]), GUILayout.Width(200));
+                if (val != decree[i])
+                {
+                    decree[i] = val;
+                    DecreeData.SetDecrees(decrees);
+                }
                 GUILayout.EndHorizontal();
             }
 

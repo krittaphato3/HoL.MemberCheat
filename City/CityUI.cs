@@ -30,12 +30,7 @@ namespace HoLMod.MemberCheat.City
             if (allCities == null) return;
 
             GUILayout.Label($"Cities ({flatCities.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? flatCities
@@ -60,7 +55,7 @@ namespace HoLMod.MemberCheat.City
         private static void DrawCityEdit(List<string> city)
         {
             string name = CityData.GetCityName(city);
-            GUILayout.Label($"City: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"City: {name}", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
@@ -68,8 +63,12 @@ namespace HoLMod.MemberCheat.City
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(city[i], GUILayout.Width(200));
-                if (val != city[i]) city[i] = val;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(city[i]), GUILayout.Width(200));
+                if (val != city[i])
+                {
+                    city[i] = val;
+                    CityData.SetCities(allCities);
+                }
                 GUILayout.EndHorizontal();
             }
 
@@ -83,7 +82,6 @@ namespace HoLMod.MemberCheat.City
             allCities = CityData.GetCities();
             flatCities.Clear();
             for (int p = 0; p < allCities.Count; p++)
-            {
                 for (int c = 0; c < allCities[p].Count; c++)
                 {
                     var city = allCities[p][c];
@@ -96,7 +94,6 @@ namespace HoLMod.MemberCheat.City
                         DisplayName = name
                     });
                 }
-            }
             selectedIndex = -1;
         }
     }

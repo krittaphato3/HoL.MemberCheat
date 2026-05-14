@@ -5,18 +5,28 @@ namespace HoLMod.MemberCheat.Court
 {
     public static class CourtData
     {
-        // Guan_JingCheng = Royal Court Ministers (Ranks 1‑3)
+        private const string FieldName = "Guan_JingCheng";
+
         public static List<List<string>> GetMinisters()
         {
-            var field = typeof(Mainload).GetField("Guan_JingCheng", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(FieldName);
+        }
+
+        public static void SetMinisters(List<List<string>> list)
+        {
+            UIHelpers.WriteBackSetData(list, FieldName);
         }
 
         public static string GetMinisterName(List<string> minister)
         {
             if (minister == null || minister.Count < 2) return "???";
-            // Usually line 1 is the name or line 0 is an ID, line 1 is name
             return minister.Count > 1 ? minister[1] : "???";
         }
+
+        public static readonly Dictionary<int, string> FieldLabels = new Dictionary<int, string>
+        {
+            {0, "ID"}, {1, "Name"}, {2, "Position"}, {3, "Salary"},
+            {4, "Loyalty"}, {5, "Competence"}, {6, "Term"}
+        };
     }
 }

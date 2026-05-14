@@ -15,7 +15,7 @@ namespace HoLMod.MemberCheat
         {
             Instance = this;
             Logger = base.Logger;
-            YuanLogger.LogInfo("MemberCheat v4.0 loaded! F8 to open.");
+            YuanLogger.LogInfo($"MemberCheat {ModInfo.Version} loaded! [F8] to open.");
             gameObject.AddComponent<MainUI>();
         }
     }

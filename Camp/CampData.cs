@@ -1,15 +1,19 @@
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace HoLMod.MemberCheat.Camp
 {
     public static class CampData
     {
-        // JunYing_now[campID] -> List<string>
+        private const string FieldName = "JunYing_now";
+
         public static List<List<string>> GetCamps()
         {
-            var field = typeof(Mainload).GetField("JunYing_now", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(FieldName);
+        }
+
+        public static void SetCamps(List<List<string>> list)
+        {
+            UIHelpers.WriteBackSetData(list, FieldName);
         }
 
         public static string GetCampName(List<string> camp)

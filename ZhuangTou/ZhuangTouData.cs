@@ -1,20 +1,28 @@
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace HoLMod.MemberCheat.ZhuangTou
 {
     public static class ZhuangTouData
     {
-        // ZhuangTou_now[fiefID][farmID][managerIndex] -> List<string>
+        private const string FieldName = "ZhuangTou_now";
+
         public static List<List<List<List<string>>>> GetManagers()
         {
-            var field = typeof(Mainload).GetField("ZhuangTou_now", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            var field = typeof(Mainload).GetField(FieldName,
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
             return (field?.GetValue(null) as List<List<List<List<string>>>>) ?? new List<List<List<List<string>>>>();
+        }
+
+        public static void SetManagers(List<List<List<List<string>>>> data)
+        {
+            var field = typeof(Mainload).GetField(FieldName,
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            field?.SetValue(null, data);
+            UIHelpers.InvokeReadSetData();
         }
 
         public static string GetManagerName(List<string> manager)
         {
-            // From ZhuangTouInfoPanel: composite at index 2, sub 0 is name
             if (manager == null || manager.Count < 3) return "???";
             var parts = manager[2].Split('|');
             return parts.Length > 0 ? parts[0] : "???";

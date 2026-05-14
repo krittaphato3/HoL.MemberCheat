@@ -21,16 +21,12 @@ namespace HoLMod.MemberCheat.VassalPrince
             if (princes == null) return;
 
             GUILayout.Label($"Vassal Princes ({princes.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? princes.Select((m, i) => new { m, i }).ToList()
-                : princes.Select((m, i) => new { m, i }).Where(x => VassalPrinceData.GetPrinceName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                : princes.Select((m, i) => new { m, i })
+                    .Where(x => VassalPrinceData.GetPrinceName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
@@ -52,7 +48,7 @@ namespace HoLMod.MemberCheat.VassalPrince
         private static void DrawPrinceEdit(List<string> prince)
         {
             string name = VassalPrinceData.GetPrinceName(prince);
-            GUILayout.Label($"Prince: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Prince: {name}", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
@@ -60,8 +56,12 @@ namespace HoLMod.MemberCheat.VassalPrince
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(prince[i], GUILayout.Width(200));
-                if (val != prince[i]) prince[i] = val;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(prince[i]), GUILayout.Width(200));
+                if (val != prince[i])
+                {
+                    prince[i] = val;
+                    VassalPrinceData.SetPrinces(princes);
+                }
                 GUILayout.EndHorizontal();
             }
 

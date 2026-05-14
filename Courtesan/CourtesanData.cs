@@ -24,5 +24,11 @@ namespace HoLMod.MemberCheat.Courtesan
         {
             return member.Count > 3 && int.TryParse(member[3], out int a) ? a : -1;
         }
+
+        public static void SetCourtesans(List<List<List<string>>> value)
+        {
+            var field = typeof(Mainload).GetField("Member_Qinglou", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            field?.SetValue(null, value);
+        }
     }
 }

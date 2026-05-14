@@ -1,15 +1,19 @@
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace HoLMod.MemberCheat.Fief
 {
     public static class FiefData
     {
-        // Fengdi_now[prefID] -> List<string> (one fief per prefecture)
+        private const string FieldName = "Fengdi_now";
+
         public static List<List<string>> GetFiefs()
         {
-            var field = typeof(Mainload).GetField("Fengdi_now", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(FieldName);
+        }
+
+        public static void SetFiefs(List<List<string>> list)
+        {
+            UIHelpers.WriteBackSetData(list, FieldName);
         }
 
         public static string GetFiefName(List<string> fief)

@@ -1,15 +1,19 @@
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace HoLMod.MemberCheat.Opera
 {
     public static class OperaData
     {
-        // XiQuID_Enter – opera/drama performances
+        private const string FieldName = "XiQuID_Enter";
+
         public static List<List<string>> GetOperas()
         {
-            var field = typeof(Mainload).GetField("XiQuID_Enter", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(FieldName);
+        }
+
+        public static void SetOperas(List<List<string>> list)
+        {
+            UIHelpers.WriteBackSetData(list, FieldName);
         }
 
         public static string GetOperaName(List<string> opera)

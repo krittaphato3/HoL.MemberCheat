@@ -21,12 +21,7 @@ namespace HoLMod.MemberCheat.AttackPrefecture
             if (prefectureIDs == null) return;
 
             GUILayout.Label($"Hostile Prefectures ({prefectureIDs.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? prefectureIDs.Select((id, i) => new { id, i }).ToList()
@@ -43,22 +38,29 @@ namespace HoLMod.MemberCheat.AttackPrefecture
 
             if (selectedIndex >= 0 && selectedIndex < prefectureIDs.Count)
             {
-                int currentID = prefectureIDs[selectedIndex];
-                DrawPrefectureEdit(currentID);
+                DrawPrefectureEdit();
             }
         }
 
-        private static void DrawPrefectureEdit(int id)
+        private static void DrawPrefectureEdit()
         {
-            GUILayout.Label($"Prefecture: {id}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
-
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(100));
             GUILayout.BeginHorizontal();
             GUILayout.Label("ID:", GUILayout.Width(40));
-            string val = GUILayout.TextField(id.ToString(), GUILayout.Width(80));
-            if (int.TryParse(val, out int newID) && newID >= 0)
+            string val = GUILayout.TextField(prefectureIDs[selectedIndex].ToString(), GUILayout.Width(80));
+            if (int.TryParse(val, out int newID) && newID >= 0 && newID != prefectureIDs[selectedIndex])
+            {
                 prefectureIDs[selectedIndex] = newID;
+                AttackPrefectureData.SetAttackPrefectures(prefectureIDs);
+            }
             GUILayout.EndHorizontal();
+            UIHelpers.DangerButton("Remove Selected", () =>
+            {
+                prefectureIDs.RemoveAt(selectedIndex);
+                AttackPrefectureData.SetAttackPrefectures(prefectureIDs);
+                selectedIndex = -1;
+                Refresh();
+            });
             GUILayout.EndScrollView();
         }
 

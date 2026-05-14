@@ -46,23 +46,10 @@ namespace HoLMod.MemberCheat.ClanMember
             if (GUILayout.Button("Refresh")) { if (!showingFamily && !showingFinances) Refresh(); }
             GUILayout.EndHorizontal();
 
-            if (showingFamily)
-            {
-                DrawFamilyData();
-                return;
-            }
+            if (showingFamily) { DrawFamilyData(); return; }
+            if (showingFinances) { DrawFinances(); return; }
 
-            if (showingFinances)
-            {
-                DrawFinances();
-                return;
-            }
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(60));
-            string newSearch = GUILayout.TextField(searchText, GUILayout.Width(150));
-            if (newSearch != searchText) searchText = newSearch;
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             string[] displayNames = memberNames;
             if (!string.IsNullOrEmpty(searchText))
@@ -86,15 +73,15 @@ namespace HoLMod.MemberCheat.ClanMember
             {
                 var member = memberList[selectedMemberIndex];
                 string displayName = ClanMemberData.GetMemberName(member);
-                GUILayout.Label($"Editing: {displayName}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+                GUILayout.Label($"Editing: {displayName}", UIHelpers.BoldLabel);
 
                 if (GUILayout.Button("Dump Raw Data to Log"))
                     YuanLogger.LogInfo($"Raw ({displayName}): {string.Join(" | ", member.Select((v, i) => $"[{i}]={v}"))}");
 
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Max All (100)")) MaxAllStats(member, 100);
-                if (GUILayout.Button("Boost +10")) BoostAllStats(member, 10);
-                GUILayout.EndHorizontal();
+                UIHelpers.ActionButtons(
+                    ("Max All (100)", () => MaxAllStats(member, 100)),
+                    ("Boost +10", () => BoostAllStats(member, 10))
+                );
 
                 scrollEditor = GUILayout.BeginScrollView(scrollEditor, GUILayout.Height(580));
                 DrawNameAge(member);
@@ -104,7 +91,6 @@ namespace HoLMod.MemberCheat.ClanMember
                 DrawStatGroup(member, "Other Attributes", ClanMemberData.LowerStats, 100, true);
                 DrawClanLeader(member);
 
-                // --- NEW SECTIONS ---
                 if (member.Count > ClanMemberData.IDX_STATUS)
                     DrawStatusEditor(member);
                 if (member.Count > ClanMemberData.IDX_MARRIAGE)
@@ -122,28 +108,17 @@ namespace HoLMod.MemberCheat.ClanMember
                 if (member.Count > ClanMemberData.IDX_STUDY_SCHOOL)
                     DrawStudySchoolEditor(member);
 
-                // --- EXTRA INTERNAL DATA SECTIONS ---
-                DrawInternalDataSection("Appearance", member, ClanMemberData.IDX_APPEARANCE);
-                DrawInternalDataSection("Children IDs", member, ClanMemberData.IDX_CHILD_IDS);
-                DrawInternalDataSection("Estate / School", member, ClanMemberData.IDX_ESTATE);
-                DrawIntFieldSection("Status Duration", member, ClanMemberData.IDX_STATUS_DURATION);
-                DrawIntFieldSection("Book Progress", member, ClanMemberData.IDX_BOOK_PROGRESS);
-                DrawInternalDataSection("Recent Events", member, ClanMemberData.IDX_RECENT_EVENTS);
-                DrawInternalDataSection("Basic Stat Gain", member, ClanMemberData.IDX_BASIC_STAT_GAIN);
-                DrawInternalDataSection("School Values", member, ClanMemberData.IDX_SCHOOL_VALUES);
-                DrawIntFieldSection("Preg. Cooldown", member, ClanMemberData.IDX_PREGNANCY_COOLDOWN);
-                DrawLongTextField("Biography", member, ClanMemberData.IDX_BIOGRAPHY);
-
+                DrawExtraInternalFields(member);
                 DrawRankEditor(member);
                 GUILayout.EndScrollView();
 
-                if (GUILayout.Button("Exile Member"))
+                UIHelpers.DangerButton("Exile Member", () =>
                 {
                     memberList.RemoveAt(selectedMemberIndex);
                     ApplyChanges();
                     selectedMemberIndex = -1;
                     Refresh();
-                }
+                });
             }
             else
             {
@@ -151,11 +126,10 @@ namespace HoLMod.MemberCheat.ClanMember
             }
         }
 
-        // ===================== FAMILY DATA =====================
         private static void DrawFamilyData()
         {
             scrollEditor = GUILayout.BeginScrollView(scrollEditor, GUILayout.Height(580));
-            GUILayout.Label("── Family Data ──", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Family Data");
             var familyData = ClanMemberData.GetFamilyData();
             int maxIndex = Mathf.Min(familyData.Count - 1, 6);
             for (int i = 0; i <= maxIndex; i++)
@@ -168,7 +142,7 @@ namespace HoLMod.MemberCheat.ClanMember
                 GUILayout.EndHorizontal();
             }
             GUILayout.Space(10);
-            GUILayout.Label("── Treasure ──", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Treasure");
             var cgNum = ClanMemberData.GetCGNum();
             while (cgNum.Count < 3) cgNum.Add("0");
             long underBillions = 0, billions = 0;
@@ -243,41 +217,38 @@ namespace HoLMod.MemberCheat.ClanMember
             GUILayout.EndScrollView();
         }
 
-        // ===================== FINANCES =====================
         private static void DrawFinances()
         {
             scrollEditor = GUILayout.BeginScrollView(scrollEditor, GUILayout.Height(580));
 
-            GUILayout.Label("── Income (ZhangMu) ──", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Income (ZhangMu)");
             var zhiZeData = ClanMemberData.GetZhiZeData_ZhangMu();
             if (zhiZeData != null)
             {
-                string[] zhiZeLabels = { "Auto‑Purchase", "Social", "Entertainment", "Trade", null, null, null, null, null, null };
-                for (int i = 0; i < zhiZeData.Count; i++)
+                string[] zhiZeLabels = { "Auto-Purchase", "Social", "Entertainment", "Trade" };
+                for (int i = 0; i < zhiZeData.Count && i < zhiZeLabels.Length; i++)
                 {
-                    if (i >= zhiZeLabels.Length || zhiZeLabels[i] == null) continue;
-                    string label = zhiZeLabels[i];
+                    if (zhiZeLabels[i] == null) continue;
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label($"{label}:", GUILayout.Width(110));
-                    string val = GUILayout.TextField(zhiZeData[i], GUILayout.Width(200));
+                    GUILayout.Label($"{zhiZeLabels[i]}:", GUILayout.Width(110));
+                    string val = GUILayout.TextField(UIHelpers.GetDisplayValue(zhiZeData[i]), GUILayout.Width(200));
                     if (val != zhiZeData[i]) { zhiZeData[i] = val; ClanMemberData.SetZhiZeData_ZhangMu(zhiZeData); }
                     GUILayout.EndHorizontal();
                 }
             }
 
             GUILayout.Space(10);
-            GUILayout.Label("── Spending (PerData) ──", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Spending (PerData)");
             var perData = ClanMemberData.GetPerData();
             if (perData != null)
             {
-                string[] perLabels = { "Vassal Tax", "Land Tax", null, null, null, null, null, null, null, null };
-                for (int i = 0; i < perData.Count; i++)
+                string[] perLabels = { "Vassal Tax", "Land Tax" };
+                for (int i = 0; i < perData.Count && i < perLabels.Length; i++)
                 {
-                    if (i >= perLabels.Length || perLabels[i] == null) continue;
-                    string label = perLabels[i];
+                    if (perLabels[i] == null) continue;
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label($"{label}:", GUILayout.Width(110));
-                    string val = GUILayout.TextField(perData[i], GUILayout.Width(200));
+                    GUILayout.Label($"{perLabels[i]}:", GUILayout.Width(110));
+                    string val = GUILayout.TextField(UIHelpers.GetDisplayValue(perData[i]), GUILayout.Width(200));
                     if (val != perData[i]) { perData[i] = val; ClanMemberData.SetPerData(perData); }
                     GUILayout.EndHorizontal();
                 }
@@ -286,7 +257,6 @@ namespace HoLMod.MemberCheat.ClanMember
             GUILayout.EndScrollView();
         }
 
-        // ===================== MEMBER EDITOR =====================
         private static void Refresh()
         {
             scrollMember = Vector2.zero;
@@ -328,29 +298,20 @@ namespace HoLMod.MemberCheat.ClanMember
 
         private static void DrawCompositeEditor(List<string> member)
         {
-            GUILayout.Label("Basic Info", GUI.skin.label);
-            // Gender
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Gender:", GUILayout.Width(60));
-            string genderStr = ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_GENDER);
-            int.TryParse(genderStr, out int gender);
-            string genderLabel = ClanMemberData.GenderOptions.ContainsKey(gender) ? ClanMemberData.GenderOptions[gender] : "?";
-            GUILayout.Label(genderLabel, GUILayout.Width(60));
-            if (GUILayout.Button("Male")) { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_GENDER, "1"); ApplyChanges(); }
-            if (GUILayout.Button("Female")) { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_GENDER, "0"); ApplyChanges(); }
-            GUILayout.EndHorizontal();
-            // Talent Type
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Talent:", GUILayout.Width(60));
-            string talentStr = ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_TALENT_TYPE);
-            int.TryParse(talentStr, out int talent);
-            string talentLabel = ClanMemberData.TalentTypeOptions.ContainsKey(talent) ? ClanMemberData.TalentTypeOptions[talent] : "?";
-            GUILayout.Label(talentLabel, GUILayout.Width(70));
-            foreach (var opt in ClanMemberData.TalentTypeOptions)
-                if (GUILayout.Button(opt.Value))
-                { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_TALENT_TYPE, opt.Key.ToString()); ApplyChanges(); }
-            GUILayout.EndHorizontal();
-            // Talent Value
+            UIHelpers.Section("Basic Info");
+
+            UIHelpers.DropdownButtons("Gender",
+                ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_GENDER) == "1" ? "Male" : "Female",
+                ClanMemberData.GenderOptions, key =>
+                { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_GENDER, key.ToString()); ApplyChanges(); });
+
+            int.TryParse(ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_TALENT_TYPE), out int talent);
+            UIHelpers.DropdownButtons("Talent",
+                ClanMemberData.TalentTypeOptions.ContainsKey(talent) ? ClanMemberData.TalentTypeOptions[talent] : "?",
+                ClanMemberData.TalentTypeOptions, key =>
+                { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_TALENT_TYPE, key.ToString()); ApplyChanges(); },
+                60, 70);
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("Talent Value:", GUILayout.Width(90));
             string tvStr = GUILayout.TextField(ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_TALENT_VALUE), GUILayout.Width(40));
@@ -359,33 +320,24 @@ namespace HoLMod.MemberCheat.ClanMember
             if (GUILayout.Button("MAX"))
             { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_TALENT_VALUE, "100"); ApplyChanges(); }
             GUILayout.EndHorizontal();
-            // Skill Type
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Skill:", GUILayout.Width(60));
-            string skillStr = ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_SKILL_TYPE);
-            int.TryParse(skillStr, out int skill);
-            string skillLabel = ClanMemberData.SkillTypeOptions.ContainsKey(skill) ? ClanMemberData.SkillTypeOptions[skill] : "?";
-            GUILayout.Label(skillLabel, GUILayout.Width(90));
-            foreach (var opt in ClanMemberData.SkillTypeOptions)
-                if (GUILayout.Button(opt.Value))
-                { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_SKILL_TYPE, opt.Key.ToString()); ApplyChanges(); }
-            GUILayout.EndHorizontal();
-            // Skill Value
-            int skValIdx = ClanMemberData.IDX_SKILL_VALUE;
-            if (skValIdx < member.Count)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Skill Value:", GUILayout.Width(90));
-                string skValStr = GUILayout.TextField(member[skValIdx], GUILayout.Width(50));
-                if (skValStr != member[skValIdx] && int.TryParse(skValStr, out int newSkVal))
-                { member[skValIdx] = newSkVal.ToString(); ApplyChanges(); }
-                if (GUILayout.Button("MAX"))
-                { member[skValIdx] = "100"; ApplyChanges(); }
-                GUILayout.EndHorizontal();
-            }
-            // Hobby
-            DrawHobbyEditor(member);
-            // Luck
+
+            int.TryParse(ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_SKILL_TYPE), out int skill);
+            UIHelpers.DropdownButtons("Skill",
+                ClanMemberData.SkillTypeOptions.ContainsKey(skill) ? ClanMemberData.SkillTypeOptions[skill] : "?",
+                ClanMemberData.SkillTypeOptions, key =>
+                { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_SKILL_TYPE, key.ToString()); ApplyChanges(); },
+                60, 90);
+
+            if (ClanMemberData.IDX_SKILL_VALUE < member.Count)
+                UIHelpers.IntFieldWithButtons("Skill Value", member, ClanMemberData.IDX_SKILL_VALUE, 100, ApplyChanges);
+
+            int.TryParse(ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_HOBBY), out int hobby);
+            UIHelpers.DropdownButtonsWrapped("Hobby",
+                ClanMemberData.HobbyOptions.ContainsKey(hobby) ? ClanMemberData.HobbyOptions[hobby] : "?",
+                ClanMemberData.HobbyOptions, key =>
+                { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_HOBBY, key.ToString()); ApplyChanges(); },
+                5, 60);
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("Luck:", GUILayout.Width(60));
             string luckStr = GUILayout.TextField(ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_LUCK), GUILayout.Width(40));
@@ -396,96 +348,31 @@ namespace HoLMod.MemberCheat.ClanMember
             GUILayout.EndHorizontal();
         }
 
-        private static void DrawHobbyEditor(List<string> member)
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Hobby:", GUILayout.Width(60));
-            string hobbyStr = ClanMemberData.GetCompositeSub(member, ClanMemberData.SUB_HOBBY);
-            int.TryParse(hobbyStr, out int hobby);
-            string hobbyLabel = ClanMemberData.HobbyOptions.ContainsKey(hobby) ? ClanMemberData.HobbyOptions[hobby] : "?";
-            GUILayout.Label(hobbyLabel, GUILayout.Width(80));
-            for (int i = 0; i < 5; i++)
-            {
-                var opt = ClanMemberData.HobbyOptions.ElementAt(i);
-                if (GUILayout.Button(opt.Value))
-                { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_HOBBY, opt.Key.ToString()); ApplyChanges(); }
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("", GUILayout.Width(60));
-            for (int i = 5; i < ClanMemberData.HobbyOptions.Count; i++)
-            {
-                var opt = ClanMemberData.HobbyOptions.ElementAt(i);
-                if (GUILayout.Button(opt.Value))
-                { ClanMemberData.SetCompositeSub(member, ClanMemberData.SUB_HOBBY, opt.Key.ToString()); ApplyChanges(); }
-            }
-            GUILayout.EndHorizontal();
-        }
-
         private static void DrawPersonalityEditor(List<string> member)
         {
-            GUILayout.Label("Personality", GUI.skin.label);
             int idx = ClanMemberData.IDX_PERSONALITY;
             if (idx >= member.Count) return;
             int.TryParse(member[idx], out int currentPers);
             string currentLabel = ClanMemberData.PersonalityOptions.ContainsKey(currentPers) ? ClanMemberData.PersonalityOptions[currentPers] : "?";
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"Current: {currentLabel}", GUILayout.Width(120));
-            for (int i = 0; i < 8; i++)
-            {
-                var opt = ClanMemberData.PersonalityOptions.ElementAt(i);
-                if (GUILayout.Button(opt.Value))
-                { member[idx] = opt.Key.ToString(); ApplyChanges(); }
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("", GUILayout.Width(120));
-            for (int i = 8; i < ClanMemberData.PersonalityOptions.Count; i++)
-            {
-                var opt = ClanMemberData.PersonalityOptions.ElementAt(i);
-                if (GUILayout.Button(opt.Value))
-                { member[idx] = opt.Key.ToString(); ApplyChanges(); }
-            }
-            GUILayout.EndHorizontal();
+            UIHelpers.DropdownButtonsWrapped("Personality", currentLabel,
+                ClanMemberData.PersonalityOptions, key =>
+                { member[idx] = key.ToString(); ApplyChanges(); }, 8, 60);
         }
 
         private static void DrawStatGroup(List<string> member, string title, List<int> indices, int maxValue, bool handleRenownAsInt = false)
         {
-            GUILayout.Label($"--- {title} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section(title);
             foreach (int idx in indices)
             {
                 if (idx >= member.Count) continue;
                 string label = ClanMemberData.MainStats.ContainsKey(idx) ? ClanMemberData.MainStats[idx] : $"Attr {idx}";
-                string valStr = member[idx];
-
-                if (float.TryParse(valStr, out float fv))
-                    valStr = ((int)fv).ToString();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"{label}:", GUILayout.Width(90));
-                string newVal = GUILayout.TextField(valStr, GUILayout.Width(50));
-                if (newVal != valStr)
-                {
-                    if (int.TryParse(newVal, out int iVal))
-                        member[idx] = iVal.ToString();
-                    else
-                        member[idx] = newVal;
-                    ApplyChanges();
-                }
-                if (int.TryParse(valStr, out int cur))
-                {
-                    if (GUILayout.Button("-")) { member[idx] = Mathf.Max(0, cur - 1).ToString(); ApplyChanges(); }
-                    if (GUILayout.Button("+")) { member[idx] = (cur + 1).ToString(); ApplyChanges(); }
-                    if (GUILayout.Button($"MAX({maxValue})")) { member[idx] = maxValue.ToString(); ApplyChanges(); }
-                }
-                GUILayout.EndHorizontal();
+                UIHelpers.FloatFieldWithButtons(label, member, idx, maxValue, ApplyChanges);
             }
         }
 
-        // ===================== NEW SECTIONS =====================
         private static void DrawStatusEditor(List<string> member)
         {
-            GUILayout.Label("--- Status ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Status");
             int idx = ClanMemberData.IDX_STATUS;
             int.TryParse(member[idx], out int curr);
             string currLabel = ClanMemberData.StatusOptions.ContainsKey(curr) ? ClanMemberData.StatusOptions[curr] : "?";
@@ -504,20 +391,18 @@ namespace HoLMod.MemberCheat.ClanMember
 
         private static void DrawMarriageEditor(List<string> member)
         {
-            GUILayout.Label("--- Marriage ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Marriage");
             int idx = ClanMemberData.IDX_MARRIAGE;
             int.TryParse(member[idx], out int curr);
             string currLabel = ClanMemberData.MarriageOptions.ContainsKey(curr) ? ClanMemberData.MarriageOptions[curr] : "?";
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"Current: {currLabel}", GUILayout.Width(120));
-            foreach (var opt in ClanMemberData.MarriageOptions)
-                if (GUILayout.Button(opt.Value)) { member[idx] = opt.Key.ToString(); ApplyChanges(); }
-            GUILayout.EndHorizontal();
+            UIHelpers.DropdownButtons("Status", currLabel,
+                ClanMemberData.MarriageOptions, key =>
+                { member[idx] = key.ToString(); ApplyChanges(); }, 60, 120);
         }
 
         private static void DrawPregnancyEditor(List<string> member, int idx)
         {
-            GUILayout.Label("--- Pregnancy ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Pregnancy");
             string val = member[idx];
             GUILayout.BeginHorizontal();
             GUILayout.Label($"Month: {val}", GUILayout.Width(100));
@@ -534,7 +419,7 @@ namespace HoLMod.MemberCheat.ClanMember
 
         private static void DrawScholarshipEditor(List<string> member)
         {
-            GUILayout.Label("--- Scholarship ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Scholarship");
             int idx = ClanMemberData.IDX_SCHOLARSHIP;
             int.TryParse(member[idx], out int curr);
             string currLabel = ClanMemberData.ScholarshipTitles.ContainsKey(curr) ? ClanMemberData.ScholarshipTitles[curr] : "?";
@@ -553,7 +438,7 @@ namespace HoLMod.MemberCheat.ClanMember
 
         private static void DrawFiefEditor(List<string> member)
         {
-            GUILayout.Label("--- Fief Title ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Fief Title");
             int idx = ClanMemberData.IDX_FIEF_TITLE;
             string raw = member[idx];
             var parts = raw.Split('|');
@@ -570,16 +455,16 @@ namespace HoLMod.MemberCheat.ClanMember
 
         private static void DrawTraitsEditor(List<string> member)
         {
-            GUILayout.Label("--- Traits ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Traits");
             int idx = ClanMemberData.IDX_TRAITS;
             string traits = member[idx];
             GUILayout.Label($"Current: {(traits == "null" ? "None" : traits)}");
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Prodigy")) { member[idx] = "4@-1"; ApplyChanges(); }
-            if (GUILayout.Button("Noble")) { member[idx] = "5@-1"; ApplyChanges(); }
-            if (GUILayout.Button("Tireless")) { member[idx] = "18@-1"; ApplyChanges(); }
-            if (GUILayout.Button("Remove All")) { member[idx] = "null"; ApplyChanges(); }
-            GUILayout.EndHorizontal();
+            UIHelpers.ActionButtons(
+                ("Prodigy", () => { member[idx] = "4@-1"; ApplyChanges(); }),
+                ("Noble", () => { member[idx] = "5@-1"; ApplyChanges(); }),
+                ("Tireless", () => { member[idx] = "18@-1"; ApplyChanges(); }),
+                ("Remove All", () => { member[idx] = "null"; ApplyChanges(); })
+            );
             GUILayout.BeginHorizontal();
             GUILayout.Label("Edit:", GUILayout.Width(40));
             string newTraits = GUILayout.TextField(traits, GUILayout.Width(200));
@@ -589,7 +474,7 @@ namespace HoLMod.MemberCheat.ClanMember
 
         private static void DrawClanDutyEditor(List<string> member)
         {
-            GUILayout.Label("--- Clan Duty ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Clan Duty");
             int idx = ClanMemberData.IDX_CLAN_DUTY;
             GUILayout.BeginHorizontal();
             GUILayout.Label("Duty:", GUILayout.Width(50));
@@ -600,55 +485,33 @@ namespace HoLMod.MemberCheat.ClanMember
 
         private static void DrawStudySchoolEditor(List<string> member)
         {
-            GUILayout.Label("--- Study School ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Study School");
             int idx = ClanMemberData.IDX_STUDY_SCHOOL;
             int.TryParse(member[idx], out int curr);
             string currLabel = ClanMemberData.StudySchools.ContainsKey(curr) ? ClanMemberData.StudySchools[curr] : "?";
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"School: {currLabel}", GUILayout.Width(120));
-            foreach (var opt in ClanMemberData.StudySchools)
-                if (GUILayout.Button(opt.Value)) { member[idx] = opt.Key.ToString(); ApplyChanges(); }
-            GUILayout.EndHorizontal();
+            UIHelpers.DropdownButtons("School", currLabel,
+                ClanMemberData.StudySchools, key =>
+                { member[idx] = key.ToString(); ApplyChanges(); }, 60, 120);
         }
 
-        // --- EXTRA INTERNAL DATA SECTIONS ---
-        private static void DrawInternalDataSection(string label, List<string> member, int idx)
+        private static void DrawExtraInternalFields(List<string> member)
         {
-            if (idx >= member.Count) return;
-            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"{label}:", GUILayout.Width(100));
-            string val = GUILayout.TextField(member[idx], GUILayout.Width(300));
-            if (val != member[idx]) { member[idx] = val; ApplyChanges(); }
-            GUILayout.EndHorizontal();
+            UIHelpers.Section("Extra Data");
+            UIHelpers.TextField("Appearance", member, ClanMemberData.IDX_APPEARANCE, 120, 300, ApplyChanges);
+            UIHelpers.TextField("Children IDs", member, ClanMemberData.IDX_CHILD_IDS, 120, 300, ApplyChanges);
+            UIHelpers.TextField("Estate / School", member, ClanMemberData.IDX_ESTATE, 120, 300, ApplyChanges);
+            UIHelpers.IntField("Status Duration", member, ClanMemberData.IDX_STATUS_DURATION, 60, ApplyChanges);
+            UIHelpers.IntField("Book Progress", member, ClanMemberData.IDX_BOOK_PROGRESS, 60, ApplyChanges);
+            UIHelpers.TextField("Recent Events", member, ClanMemberData.IDX_RECENT_EVENTS, 120, 300, ApplyChanges);
+            UIHelpers.TextField("Basic Stat Gain", member, ClanMemberData.IDX_BASIC_STAT_GAIN, 120, 300, ApplyChanges);
+            UIHelpers.TextField("School Values", member, ClanMemberData.IDX_SCHOOL_VALUES, 120, 300, ApplyChanges);
+            UIHelpers.IntField("Preg. Cooldown", member, ClanMemberData.IDX_PREGNANCY_COOLDOWN, 60, ApplyChanges);
+            UIHelpers.TextField("Biography", member, ClanMemberData.IDX_BIOGRAPHY, 100, 300, ApplyChanges);
         }
 
-        private static void DrawIntFieldSection(string label, List<string> member, int idx)
-        {
-            if (idx >= member.Count) return;
-            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"{label}:", GUILayout.Width(100));
-            string val = GUILayout.TextField(member[idx], GUILayout.Width(60));
-            if (val != member[idx] && int.TryParse(val, out int iVal)) { member[idx] = iVal.ToString(); ApplyChanges(); }
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DrawLongTextField(string label, List<string> member, int idx)
-        {
-            if (idx >= member.Count) return;
-            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"{label}:", GUILayout.Width(100));
-            string val = GUILayout.TextField(member[idx], GUILayout.Width(300));
-            if (val != member[idx]) { member[idx] = val; ApplyChanges(); }
-            GUILayout.EndHorizontal();
-        }
-
-        // ===================== RANK EDITOR =====================
         private static void DrawRankEditor(List<string> member)
         {
-            GUILayout.Label("--- Official Rank & Office ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Official Rank & Office");
             int rankIdx = RankManager.FindRankIndex(member);
             if (rankIdx >= 0)
             {
@@ -664,34 +527,24 @@ namespace HoLMod.MemberCheat.ClanMember
                 GUILayout.Label("Presets:", GUI.skin.label);
                 foreach (var category in RankManager.Presets)
                 {
-                    GUILayout.Label(category.CategoryName, new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
-                    DrawButtonFlow(category.Presets, preset =>
+                    GUILayout.Label(category.CategoryName, UIHelpers.SectionHeader);
+                    for (int j = 0; j < category.Presets.Count; j += 4)
                     {
-                        if (GUILayout.Button(preset.Label, GUILayout.MaxWidth(180)))
+                        GUILayout.BeginHorizontal();
+                        for (int k = j; k < j + 4 && k < category.Presets.Count; k++)
                         {
-                            member[rankIdx] = preset.Code;
-                            ApplyChanges();
+                            var preset = category.Presets[k];
+                            if (GUILayout.Button(preset.Label, GUILayout.MaxWidth(180)))
+                            { member[rankIdx] = preset.Code; ApplyChanges(); }
                         }
-                    });
+                        GUILayout.EndHorizontal();
+                    }
                     GUILayout.Space(4);
                 }
             }
             else GUILayout.Label("No rank field found.");
         }
 
-        private static void DrawButtonFlow<T>(List<T> items, Action<T> drawItem)
-        {
-            int perRow = 4;
-            for (int i = 0; i < items.Count; i += perRow)
-            {
-                GUILayout.BeginHorizontal();
-                for (int j = i; j < i + perRow && j < items.Count; j++)
-                    drawItem(items[j]);
-                GUILayout.EndHorizontal();
-            }
-        }
-
-        // ===================== CHEAT METHODS =====================
         private static void MaxAllStats(List<string> member, int maxVal)
         {
             foreach (int idx in ClanMemberData.MainStats.Keys)
@@ -709,9 +562,7 @@ namespace HoLMod.MemberCheat.ClanMember
                 if (idx >= member.Count) continue;
                 int cur = 0;
                 if (idx == ClanMemberData.IDX_RENOWN)
-                {
-                    if (float.TryParse(member[idx], out float f)) cur = (int)f;
-                }
+                { if (float.TryParse(member[idx], out float f)) cur = (int)f; }
                 else int.TryParse(member[idx], out cur);
                 member[idx] = Mathf.Clamp(cur + amount, 0, 100).ToString();
             }
@@ -730,28 +581,6 @@ namespace HoLMod.MemberCheat.ClanMember
         {
             int idx = ClanMemberData.IDX_AGE;
             if (idx < member.Count) member[idx] = newAge.ToString();
-            ApplyChanges();
-        }
-
-        private static void ChangeStat(List<string> member, int idx, int delta, int maxValue, bool isIntRenown = false)
-        {
-            if (idx >= member.Count) return;
-            int curValue = 0;
-            string raw = member[idx];
-            if (isIntRenown && idx == ClanMemberData.IDX_RENOWN)
-            {
-                if (float.TryParse(raw, out float f)) curValue = (int)f;
-                else return;
-            }
-            else { if (!int.TryParse(raw, out curValue)) return; }
-            member[idx] = Mathf.Clamp(curValue + delta, 0, maxValue).ToString();
-            ApplyChanges();
-        }
-
-        private static void SetStat(List<string> member, int idx, int value, bool isIntRenown = false)
-        {
-            if (idx >= member.Count) return;
-            member[idx] = value.ToString();
             ApplyChanges();
         }
 

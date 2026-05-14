@@ -21,16 +21,12 @@ namespace HoLMod.MemberCheat.Court
             if (ministers == null) return;
 
             GUILayout.Label($"Court Ministers ({ministers.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? ministers.Select((m, i) => new { m, i }).ToList()
-                : ministers.Select((m, i) => new { m, i }).Where(x => CourtData.GetMinisterName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                : ministers.Select((m, i) => new { m, i })
+                    .Where(x => CourtData.GetMinisterName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
@@ -52,16 +48,21 @@ namespace HoLMod.MemberCheat.Court
         private static void DrawMinisterEdit(List<string> minister)
         {
             string name = CourtData.GetMinisterName(minister);
-            GUILayout.Label($"Editing: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Editing: {name}", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
             for (int i = 0; i < minister.Count; i++)
             {
+                string label = CourtData.FieldLabels.ContainsKey(i) ? CourtData.FieldLabels[i] : $"Field {i}";
                 GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
+                GUILayout.Label($"{label}:", GUILayout.Width(100));
                 string val = GUILayout.TextField(minister[i], GUILayout.Width(200));
-                if (val != minister[i]) minister[i] = val;
+                if (val != minister[i])
+                {
+                    minister[i] = val;
+                    CourtData.SetMinisters(ministers);
+                }
                 GUILayout.EndHorizontal();
             }
 

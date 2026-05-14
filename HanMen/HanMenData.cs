@@ -1,15 +1,19 @@
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace HoLMod.MemberCheat.HanMen
 {
     public static class HanMenData
     {
-        // Member_HanMen – list of civilian clan members
+        private const string FieldName = "Member_HanMen";
+
         public static List<List<string>> GetMembers()
         {
-            var field = typeof(Mainload).GetField("Member_HanMen", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(FieldName);
+        }
+
+        public static void SetMembers(List<List<string>> list)
+        {
+            UIHelpers.WriteBackSetData(list, FieldName);
         }
 
         public static string GetName(List<string> member)

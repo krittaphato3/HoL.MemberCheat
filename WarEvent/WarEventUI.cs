@@ -21,16 +21,12 @@ namespace HoLMod.MemberCheat.WarEvent
             if (warEvents == null) return;
 
             GUILayout.Label($"War Events ({warEvents.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? warEvents.Select((m, i) => new { m, i }).ToList()
-                : warEvents.Select((m, i) => new { m, i }).Where(x => WarEventData.GetEventName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                : warEvents.Select((m, i) => new { m, i })
+                    .Where(x => WarEventData.GetEventName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
@@ -52,7 +48,7 @@ namespace HoLMod.MemberCheat.WarEvent
         private static void DrawWarEventEdit(List<string> warEvent)
         {
             string name = WarEventData.GetEventName(warEvent);
-            GUILayout.Label($"Event: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Event: {name}", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
@@ -60,8 +56,12 @@ namespace HoLMod.MemberCheat.WarEvent
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(warEvent[i], GUILayout.Width(200));
-                if (val != warEvent[i]) warEvent[i] = val;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(warEvent[i]), GUILayout.Width(200));
+                if (val != warEvent[i])
+                {
+                    warEvent[i] = val;
+                    WarEventData.SetWarEvents(warEvents);
+                }
                 GUILayout.EndHorizontal();
             }
 

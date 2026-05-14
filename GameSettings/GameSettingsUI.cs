@@ -8,11 +8,12 @@ namespace HoLMod.MemberCheat.GameSettings
     public static class GameSettingsUI
     {
         private static Vector2 scroll;
+        private const string TimeField = "Time_now";
 
         public static void Draw()
         {
             scroll = GUILayout.BeginScrollView(scroll);
-            GUILayout.Label("Date / Time", GUI.skin.label);
+            UIHelpers.Section("Date / Time");
             var timeList = GetTimeList();
             if (timeList != null && timeList.Count >= 3)
             {
@@ -36,20 +37,34 @@ namespace HoLMod.MemberCheat.GameSettings
                 if (dayStr != timeList[2].ToString() && int.TryParse(dayStr, out int day))
                 { timeList[2] = Mathf.Clamp(day, 1, 30); ApplyTimeList(timeList); }
                 GUILayout.EndHorizontal();
+
+                GUILayout.Space(10);
+                UIHelpers.Section("Quick Date Presets");
+                GUI.color = Color.green;
+                UIHelpers.ActionButtons(
+                    ("+1 Day", () => { timeList[2] = Mathf.Clamp(timeList[2] + 1, 1, 30); ApplyTimeList(timeList); }),
+                    ("+1 Month", () => { timeList[1] = Mathf.Clamp(timeList[1] + 1, 1, 12); ApplyTimeList(timeList); }),
+                    ("+1 Year", () => { timeList[0]++; ApplyTimeList(timeList); }),
+                    ("-1 Day", () => { timeList[2] = Mathf.Clamp(timeList[2] - 1, 1, 30); ApplyTimeList(timeList); }),
+                    ("-1 Month", () => { timeList[1] = Mathf.Clamp(timeList[1] - 1, 1, 12); ApplyTimeList(timeList); }),
+                    ("-1 Year", () => { timeList[0] = Math.Max(1, timeList[0] - 1); ApplyTimeList(timeList); })
+                );
+                GUI.color = Color.white;
             }
             GUILayout.EndScrollView();
         }
 
         private static List<int> GetTimeList()
         {
-            var field = typeof(Mainload).GetField("Time_now", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            var field = typeof(Mainload).GetField(TimeField, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
             return field?.GetValue(null) as List<int>;
         }
 
         private static void ApplyTimeList(List<int> timeList)
         {
-            typeof(Mainload).GetField("Time_now", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)?.SetValue(null, timeList);
-            typeof(Mainload).GetMethod("ReadSetData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)?.Invoke(null, null);
+            var field = typeof(Mainload).GetField(TimeField, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            field?.SetValue(null, timeList);
+            UIHelpers.InvokeReadSetData();
         }
     }
 }

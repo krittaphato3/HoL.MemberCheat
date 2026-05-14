@@ -5,16 +5,20 @@ namespace HoLMod.MemberCheat.ShiJia
 {
     public static class ShiJiaData
     {
+        private static readonly string Field_ShiJia = "ShiJia_Now";
+        private static readonly string Field_Member = "Member_other";
+        private static readonly string Field_Spouse = "Member_Other_qu";
+
+        // ========== Clan-level ==========
         public static List<List<string>> GetClanList()
         {
-            var field = typeof(Mainload).GetField("ShiJia_Now", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(Field_ShiJia);
         }
 
+        // ========== Member/Spouse lists ==========
         public static List<List<string>> GetMembers(int clanID)
         {
-            var field = typeof(Mainload).GetField("Member_other", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            var all = field?.GetValue(null) as List<List<List<string>>>;
+            var all = GetFieldNested(Field_Member);
             if (all != null && clanID >= 0 && clanID < all.Count)
                 return all[clanID];
             return new List<List<string>>();
@@ -22,11 +26,40 @@ namespace HoLMod.MemberCheat.ShiJia
 
         public static List<List<string>> GetSpouses(int clanID)
         {
-            var field = typeof(Mainload).GetField("Member_Other_qu", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            var all = field?.GetValue(null) as List<List<List<string>>>;
+            var all = GetFieldNested(Field_Spouse);
             if (all != null && clanID >= 0 && clanID < all.Count)
                 return all[clanID];
             return new List<List<string>>();
+        }
+
+        public static void SetMembers(int clanID, List<List<string>> members)
+        {
+            var all = GetFieldNested(Field_Member);
+            if (all != null && clanID >= 0 && clanID < all.Count)
+                all[clanID] = members;
+            SetFieldNested(Field_Member, all);
+            UIHelpers.InvokeReadSetData();
+        }
+
+        public static void SetSpouses(int clanID, List<List<string>> spouses)
+        {
+            var all = GetFieldNested(Field_Spouse);
+            if (all != null && clanID >= 0 && clanID < all.Count)
+                all[clanID] = spouses;
+            SetFieldNested(Field_Spouse, all);
+            UIHelpers.InvokeReadSetData();
+        }
+
+        private static List<List<List<string>>> GetFieldNested(string name)
+        {
+            var field = typeof(Mainload).GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            return field?.GetValue(null) as List<List<List<string>>>;
+        }
+
+        private static void SetFieldNested(string name, List<List<List<string>>> value)
+        {
+            var field = typeof(Mainload).GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+            field?.SetValue(null, value);
         }
 
         // ========== Composite field helpers ==========

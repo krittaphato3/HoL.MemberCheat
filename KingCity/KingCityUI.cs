@@ -22,10 +22,15 @@ namespace HoLMod.MemberCheat.KingCity
 
             for (int i = 0; i < kingCity.Count; i++)
             {
+                string label = KingCityData.FieldLabels.ContainsKey(i) ? KingCityData.FieldLabels[i] : $"Field {i}";
                 GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(kingCity[i], GUILayout.Width(300));
-                if (val != kingCity[i]) kingCity[i] = val;
+                GUILayout.Label($"{label}:", GUILayout.Width(100));
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(kingCity[i]), GUILayout.Width(300));
+                if (val != kingCity[i])
+                {
+                    kingCity[i] = val;
+                    KingCityData.SetKingCity(kingCity);
+                }
                 GUILayout.EndHorizontal();
             }
 

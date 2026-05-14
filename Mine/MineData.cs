@@ -1,15 +1,19 @@
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace HoLMod.MemberCheat.Mine
 {
     public static class MineData
     {
-        // Kuang_now[mineID] -> List<string>
+        private const string FieldName = "Kuang_now";
+
         public static List<List<string>> GetMines()
         {
-            var field = typeof(Mainload).GetField("Kuang_now", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(FieldName);
+        }
+
+        public static void SetMines(List<List<string>> list)
+        {
+            UIHelpers.WriteBackSetData(list, FieldName);
         }
 
         public static string GetMineName(List<string> mine)

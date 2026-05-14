@@ -32,12 +32,7 @@ namespace HoLMod.MemberCheat.ZhuangTou
             if (allManagers == null) return;
 
             GUILayout.Label($"Farm Managers ({flatManagers.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? flatManagers
@@ -63,21 +58,20 @@ namespace HoLMod.MemberCheat.ZhuangTou
         {
             string name = ZhuangTouData.GetManagerName(manager);
             int age = ZhuangTouData.GetAge(manager);
-            GUILayout.Label($"Manager: {name} (Age {age})", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Manager: {name} (Age {age})", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
             for (int i = 0; i < manager.Count; i++)
             {
-                string val = manager[i];
-                string intVal = val;
-                if (float.TryParse(val, out float fv))
-                    intVal = Mathf.RoundToInt(fv).ToString();
-
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string newVal = GUILayout.TextField(intVal, GUILayout.Width(120));
-                if (newVal != intVal) manager[i] = newVal;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(manager[i]), GUILayout.Width(200));
+                if (val != manager[i])
+                {
+                    manager[i] = val;
+                    ZhuangTouData.SetManagers(allManagers);
+                }
                 GUILayout.EndHorizontal();
             }
 
@@ -91,9 +85,7 @@ namespace HoLMod.MemberCheat.ZhuangTou
             allManagers = ZhuangTouData.GetManagers();
             flatManagers.Clear();
             for (int fief = 0; fief < allManagers.Count; fief++)
-            {
                 for (int farm = 0; farm < allManagers[fief].Count; farm++)
-                {
                     for (int mgr = 0; mgr < allManagers[fief][farm].Count; mgr++)
                     {
                         var manager = allManagers[fief][farm][mgr];
@@ -108,8 +100,6 @@ namespace HoLMod.MemberCheat.ZhuangTou
                             DisplayName = $"{name} (Age {age})"
                         });
                     }
-                }
-            }
             selectedIndex = -1;
         }
     }

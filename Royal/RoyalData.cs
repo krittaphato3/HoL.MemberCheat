@@ -5,19 +5,29 @@ namespace HoLMod.MemberCheat.Royal
 {
     public static class RoyalData
     {
+        private const string Field_Members = "Member_King";
+        private const string Field_Spouses = "Member_King_qu";
+
         public static List<List<string>> GetMembers()
         {
-            var field = typeof(Mainload).GetField("Member_King", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(Field_Members);
         }
 
         public static List<List<string>> GetSpouses()
         {
-            var field = typeof(Mainload).GetField("Member_King_qu", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(Field_Spouses);
         }
 
-        // ========== Composite field helpers ==========
+        public static void SetMembers(List<List<string>> list)
+        {
+            UIHelpers.WriteBackSetData(list, Field_Members);
+        }
+
+        public static void SetSpouses(List<List<string>> list)
+        {
+            UIHelpers.WriteBackSetData(list, Field_Spouses);
+        }
+
         public const int IDX_COMPOSITE = 2;
         public const int SUB_NAME = 0;
         public const int SUB_TALENT_TYPE = 2;

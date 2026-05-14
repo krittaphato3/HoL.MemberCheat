@@ -22,12 +22,7 @@ namespace HoLMod.MemberCheat.Retainer
         {
             if (needsRefresh) { Refresh(); needsRefresh = false; }
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(60));
-            string newSearch = GUILayout.TextField(searchText, GUILayout.Width(150));
-            if (newSearch != searchText) searchText = newSearch;
-            if (GUILayout.Button("Refresh")) Refresh();
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             string[] displayNames = allNames;
             if (!string.IsNullOrEmpty(searchText))
@@ -37,7 +32,7 @@ namespace HoLMod.MemberCheat.Retainer
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(120));
             if (displayNames.Length > 0)
             {
-                int displaySel = Mathf.Clamp(displayNames.ToList().IndexOf(GetCurrentMemberName()), 0, displayNames.Length - 1);
+                int displaySel = Mathf.Clamp(Array.IndexOf(displayNames, GetCurrentMemberName()), 0, displayNames.Length - 1);
                 int newSel = GUILayout.SelectionGrid(displaySel, displayNames, 1);
                 if (newSel != displaySel && newSel >= 0 && newSel < displayNames.Length)
                 {
@@ -52,12 +47,12 @@ namespace HoLMod.MemberCheat.Retainer
             {
                 var member = list[selectedIndex];
                 string displayName = RetainerData.GetName(member);
-                GUILayout.Label($"Editing: {displayName}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+                GUILayout.Label($"Editing: {displayName}", UIHelpers.BoldLabel);
 
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Max All (100)")) MaxAll(member);
-                if (GUILayout.Button("Boost +10")) BoostAll(member);
-                GUILayout.EndHorizontal();
+                UIHelpers.ActionButtons(
+                    ("Max All (100)", () => MaxAll(member)),
+                    ("Boost +10", () => BoostAll(member))
+                );
 
                 scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(600));
                 DrawNameAge(member);
@@ -65,19 +60,18 @@ namespace HoLMod.MemberCheat.Retainer
                 DrawStats(member);
                 DrawSpecialFields(member);
 
-                // --- NEW SECTIONS ---
                 if (member.Count > RetainerData.IDX_STATUS)
                     DrawStatusEditor(member);
                 if (member.Count > RetainerData.IDX_PREGNANCY)
                     DrawPregnancyEditor(member);
 
-                // --- Extra missing fields ---
-                DrawIntFieldSection("Teaching", member, RetainerData.IDX_TEACHING);
-                DrawIntFieldSection("Unknown (12)", member, RetainerData.IDX_UNKNOWN_12);
-                DrawIntFieldSection("Unknown (20)", member, RetainerData.IDX_UNKNOWN_20);
-                DrawInternalDataSection("Special Tag", member, RetainerData.IDX_SPECIAL_TAG);
-
-                DrawDanger();
+                UIHelpers.DangerButton("Dismiss Retainer", () =>
+                {
+                    list.RemoveAt(selectedIndex);
+                    Apply();
+                    selectedIndex = -1;
+                    Refresh();
+                });
                 GUILayout.EndScrollView();
             }
             else
@@ -93,7 +87,6 @@ namespace HoLMod.MemberCheat.Retainer
             return "";
         }
 
-        // ===================== DRAW SECTIONS =====================
         private static void DrawNameAge(List<string> member)
         {
             GUILayout.BeginHorizontal();
@@ -111,29 +104,19 @@ namespace HoLMod.MemberCheat.Retainer
 
         private static void DrawCompositeEditor(List<string> member)
         {
-            GUILayout.Label("Basic Info", GUI.skin.label);
+            UIHelpers.Section("Basic Info");
 
-            // Gender
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Gender:", GUILayout.Width(60));
-            string genderStr = RetainerData.GetCompositeSub(member, RetainerData.SUB_GENDER);
-            int.TryParse(genderStr, out int gender);
-            string genderLabel = gender == 0 ? "Female" : (gender == 1 ? "Male" : "?");
-            GUILayout.Label(genderLabel, GUILayout.Width(60));
-            if (GUILayout.Button("Male")) { RetainerData.SetCompositeSub(member, RetainerData.SUB_GENDER, "1"); Apply(); }
-            if (GUILayout.Button("Female")) { RetainerData.SetCompositeSub(member, RetainerData.SUB_GENDER, "0"); Apply(); }
-            GUILayout.EndHorizontal();
+            UIHelpers.DropdownButtons("Gender",
+                RetainerData.GetCompositeSub(member, RetainerData.SUB_GENDER) == "1" ? "Male" : "Female",
+                ClanData.GenderOptions, key =>
+                { RetainerData.SetCompositeSub(member, RetainerData.SUB_GENDER, key.ToString()); Apply(); });
 
-            // Talent Type & Value
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Talent:", GUILayout.Width(60));
-            string talentStr = RetainerData.GetCompositeSub(member, RetainerData.SUB_TALENT_TYPE);
-            int.TryParse(talentStr, out int talent);
-            string talentLabel = ClanData.TalentTypeOptions.ContainsKey(talent) ? ClanData.TalentTypeOptions[talent] : "?";
-            GUILayout.Label(talentLabel, GUILayout.Width(70));
-            foreach (var opt in ClanData.TalentTypeOptions)
-                if (GUILayout.Button(opt.Value)) { RetainerData.SetCompositeSub(member, RetainerData.SUB_TALENT_TYPE, opt.Key.ToString()); Apply(); }
-            GUILayout.EndHorizontal();
+            int.TryParse(RetainerData.GetCompositeSub(member, RetainerData.SUB_TALENT_TYPE), out int talent);
+            UIHelpers.DropdownButtons("Talent",
+                ClanData.TalentTypeOptions.ContainsKey(talent) ? ClanData.TalentTypeOptions[talent] : "?",
+                ClanData.TalentTypeOptions, key =>
+                { RetainerData.SetCompositeSub(member, RetainerData.SUB_TALENT_TYPE, key.ToString()); Apply(); },
+                60, 70);
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Talent Value:", GUILayout.Width(90));
@@ -142,20 +125,15 @@ namespace HoLMod.MemberCheat.Retainer
             if (GUILayout.Button("MAX")) { RetainerData.SetCompositeSub(member, RetainerData.SUB_TALENT_VALUE, "100"); Apply(); }
             GUILayout.EndHorizontal();
 
-            // Skill Type + Skill Points
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Skill:", GUILayout.Width(60));
-            string skillStr = RetainerData.GetCompositeSub(member, RetainerData.SUB_SKILL_TYPE);
-            int.TryParse(skillStr, out int skill);
-            string skillLabel = ClanData.SkillTypeOptions.ContainsKey(skill) ? ClanData.SkillTypeOptions[skill] : "?";
-            GUILayout.Label(skillLabel, GUILayout.Width(90));
-            foreach (var opt in ClanData.SkillTypeOptions)
-                if (GUILayout.Button(opt.Value)) { RetainerData.SetCompositeSub(member, RetainerData.SUB_SKILL_TYPE, opt.Key.ToString()); Apply(); }
-            GUILayout.EndHorizontal();
+            int.TryParse(RetainerData.GetCompositeSub(member, RetainerData.SUB_SKILL_TYPE), out int skill);
+            UIHelpers.DropdownButtons("Skill",
+                ClanData.SkillTypeOptions.ContainsKey(skill) ? ClanData.SkillTypeOptions[skill] : "?",
+                ClanData.SkillTypeOptions, key =>
+                { RetainerData.SetCompositeSub(member, RetainerData.SUB_SKILL_TYPE, key.ToString()); Apply(); },
+                60, 90);
 
-            DrawIntStat(member, RetainerData.IDX_SKILL_POINTS, "Skill Points", 100);
+            UIHelpers.IntFieldWithButtons("Skill Points", member, RetainerData.IDX_SKILL_POINTS, 100, Apply);
 
-            // Luck
             GUILayout.BeginHorizontal();
             GUILayout.Label("Luck:", GUILayout.Width(60));
             string luckStr = GUILayout.TextField(RetainerData.GetCompositeSub(member, RetainerData.SUB_LUCK), GUILayout.Width(40));
@@ -163,57 +141,43 @@ namespace HoLMod.MemberCheat.Retainer
             if (GUILayout.Button("100")) { RetainerData.SetCompositeSub(member, RetainerData.SUB_LUCK, "100"); Apply(); }
             GUILayout.EndHorizontal();
 
-            // Personality
-            GUILayout.Label("Personality:", GUI.skin.label);
             int.TryParse(RetainerData.GetCompositeSub(member, RetainerData.SUB_PERSONALITY), out int currPers);
-            string persLabel = ClanData.PersonalityOptions.ContainsKey(currPers) ? ClanData.PersonalityOptions[currPers] : "?";
-            GUILayout.Label($"Current: {persLabel}");
-            for (int i = 0; i < 8; i++)
-            {
-                var opt = ClanData.PersonalityOptions.ElementAt(i);
-                if (GUILayout.Button(opt.Value)) { RetainerData.SetCompositeSub(member, RetainerData.SUB_PERSONALITY, opt.Key.ToString()); Apply(); }
-            }
-            GUILayout.BeginHorizontal();
-            for (int i = 8; i < ClanData.PersonalityOptions.Count; i++)
-            {
-                var opt = ClanData.PersonalityOptions.ElementAt(i);
-                if (GUILayout.Button(opt.Value)) { RetainerData.SetCompositeSub(member, RetainerData.SUB_PERSONALITY, opt.Key.ToString()); Apply(); }
-            }
-            GUILayout.EndHorizontal();
+            UIHelpers.DropdownButtonsWrapped("Personality",
+                ClanData.PersonalityOptions.ContainsKey(currPers) ? ClanData.PersonalityOptions[currPers] : "?",
+                ClanData.PersonalityOptions, key =>
+                { RetainerData.SetCompositeSub(member, RetainerData.SUB_PERSONALITY, key.ToString()); Apply(); },
+                8, 60);
         }
 
         private static void DrawStats(List<string> member)
         {
-            GUILayout.Label("--- Stats ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
-            DrawIntStatFromFloat(member, RetainerData.IDX_WRITING, "Writing", 100);
-            DrawIntStatFromFloat(member, RetainerData.IDX_MIGHT, "Might", 100);
-            DrawIntStatFromFloat(member, RetainerData.IDX_BUSINESS, "Business", 100);
-            DrawIntStatFromFloat(member, RetainerData.IDX_ARTS, "Arts", 100);
-            DrawIntStatFromFloat(member, RetainerData.IDX_MOOD, "Mood", 100);
-            DrawIntStatFromFloat(member, RetainerData.IDX_RENOWN, "Renown", 100);
-            DrawIntStatFromFloat(member, RetainerData.IDX_CHARISMA, "Charisma", 100);
-            DrawIntStatFromFloat(member, RetainerData.IDX_HEALTH, "Health", 100);
-            DrawIntStatFromFloat(member, RetainerData.IDX_CUNNING, "Cunning", 100);
-            DrawIntStatFromFloat(member, RetainerData.IDX_STAMINA, "Stamina", 100);
+            UIHelpers.Section("Stats");
+            UIHelpers.FloatFieldWithButtons("Writing", member, RetainerData.IDX_WRITING, 100, Apply);
+            UIHelpers.FloatFieldWithButtons("Might", member, RetainerData.IDX_MIGHT, 100, Apply);
+            UIHelpers.FloatFieldWithButtons("Business", member, RetainerData.IDX_BUSINESS, 100, Apply);
+            UIHelpers.FloatFieldWithButtons("Arts", member, RetainerData.IDX_ARTS, 100, Apply);
+            UIHelpers.FloatFieldWithButtons("Mood", member, RetainerData.IDX_MOOD, 100, Apply);
+            UIHelpers.FloatFieldWithButtons("Renown", member, RetainerData.IDX_RENOWN, 100, Apply);
+            UIHelpers.FloatFieldWithButtons("Charisma", member, RetainerData.IDX_CHARISMA, 100, Apply);
+            UIHelpers.FloatFieldWithButtons("Health", member, RetainerData.IDX_HEALTH, 100, Apply);
+            UIHelpers.FloatFieldWithButtons("Cunning", member, RetainerData.IDX_CUNNING, 100, Apply);
+            UIHelpers.FloatFieldWithButtons("Stamina", member, RetainerData.IDX_STAMINA, 100, Apply);
         }
 
         private static void DrawSpecialFields(List<string> member)
         {
-            GUILayout.Label("--- Special ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Special");
+
             if (member.Count > RetainerData.IDX_SALARY)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Salary:", GUILayout.Width(80));
-                string salStr = GUILayout.TextField(member[RetainerData.IDX_SALARY], GUILayout.Width(80));
-                if (salStr != member[RetainerData.IDX_SALARY] && int.TryParse(salStr, out int salVal)) { member[RetainerData.IDX_SALARY] = salVal.ToString(); Apply(); }
-                GUILayout.EndHorizontal();
-            }
+                UIHelpers.IntFieldWithButtons("Salary", member, RetainerData.IDX_SALARY, 999999, Apply);
+
+            if (member.Count > RetainerData.IDX_TEACHING)
+                UIHelpers.FloatFieldWithButtons("Teaching", member, RetainerData.IDX_TEACHING, 100, Apply);
         }
 
-        // --- NEW SECTIONS ---
         private static void DrawStatusEditor(List<string> member)
         {
-            GUILayout.Label("--- Status ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Status");
             int idx = RetainerData.IDX_STATUS;
             int.TryParse(member[idx], out int curr);
             string currLabel = ClanData.StatusOptions.ContainsKey(curr) ? ClanData.StatusOptions[curr] : "?";
@@ -231,7 +195,7 @@ namespace HoLMod.MemberCheat.Retainer
 
         private static void DrawPregnancyEditor(List<string> member)
         {
-            GUILayout.Label("--- Pregnancy ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            UIHelpers.Section("Pregnancy");
             string val = member[RetainerData.IDX_PREGNANCY];
             GUILayout.BeginHorizontal();
             GUILayout.Label($"Month: {val}", GUILayout.Width(100));
@@ -243,78 +207,6 @@ namespace HoLMod.MemberCheat.Retainer
             GUILayout.Label("Custom:", GUILayout.Width(60));
             string newVal = GUILayout.TextField(val, GUILayout.Width(40));
             if (newVal != val && int.TryParse(newVal, out int nv)) { member[RetainerData.IDX_PREGNANCY] = nv.ToString(); Apply(); }
-            GUILayout.EndHorizontal();
-        }
-
-        // --- Extra missing field helpers ---
-        private static void DrawIntFieldSection(string label, List<string> member, int idx)
-        {
-            if (idx >= member.Count) return;
-            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"{label}:", GUILayout.Width(120));
-            string val = GUILayout.TextField(member[idx], GUILayout.Width(60));
-            if (val != member[idx] && int.TryParse(val, out int iVal)) { member[idx] = iVal.ToString(); Apply(); }
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DrawInternalDataSection(string label, List<string> member, int idx)
-        {
-            if (idx >= member.Count) return;
-            GUILayout.Label($"--- {label} ---", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"{label}:", GUILayout.Width(120));
-            string val = GUILayout.TextField(member[idx], GUILayout.Width(300));
-            if (val != member[idx]) { member[idx] = val; Apply(); }
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DrawDanger()
-        {
-            if (GUILayout.Button("Dismiss Retainer"))
-            {
-                list.RemoveAt(selectedIndex);
-                Apply();
-                selectedIndex = -1;
-                Refresh();
-            }
-        }
-
-        // ===================== HELPERS =====================
-        private static void DrawIntStat(List<string> member, int idx, string label, int maxVal)
-        {
-            if (idx >= member.Count) return;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"{label}:", GUILayout.Width(90));
-            string val = GUILayout.TextField(member[idx], GUILayout.Width(60));
-            if (val != member[idx] && int.TryParse(val, out int iVal)) { member[idx] = iVal.ToString(); Apply(); }
-            if (int.TryParse(member[idx], out int cur))
-            {
-                if (GUILayout.Button("-")) { member[idx] = Mathf.Max(0, cur - 1).ToString(); Apply(); }
-                if (GUILayout.Button("+")) { member[idx] = (cur + 1).ToString(); Apply(); }
-                if (GUILayout.Button($"MAX({maxVal})")) { member[idx] = maxVal.ToString(); Apply(); }
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DrawIntStatFromFloat(List<string> member, int idx, string label, int maxVal)
-        {
-            if (idx >= member.Count) return;
-            float.TryParse(member[idx], out float curFloat);
-            int displayVal = Mathf.RoundToInt(curFloat);
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"{label}:", GUILayout.Width(90));
-            string newVal = GUILayout.TextField(displayVal.ToString(), GUILayout.Width(60));
-            if (int.TryParse(newVal, out int newInt) && newInt != displayVal)
-            {
-                member[idx] = newInt.ToString();
-                Apply();
-            }
-            float.TryParse(member[idx], out curFloat);
-            int cur = Mathf.RoundToInt(curFloat);
-            if (GUILayout.Button("-")) { member[idx] = Mathf.Max(0, cur - 1).ToString(); Apply(); }
-            if (GUILayout.Button("+")) { member[idx] = (cur + 1).ToString(); Apply(); }
-            if (GUILayout.Button($"MAX({maxVal})")) { member[idx] = maxVal.ToString(); Apply(); }
             GUILayout.EndHorizontal();
         }
 
@@ -342,8 +234,7 @@ namespace HoLMod.MemberCheat.Retainer
                 RetainerData.IDX_CUNNING })
                 if (idx < member.Count)
                 {
-                    float cur = 0f;
-                    float.TryParse(member[idx], out cur);
+                    float.TryParse(member[idx], out float cur);
                     int newVal = Mathf.Clamp(Mathf.RoundToInt(cur) + 10, 0, 100);
                     member[idx] = newVal.ToString();
                 }
@@ -359,8 +250,6 @@ namespace HoLMod.MemberCheat.Retainer
             for (int i = 0; i < allNames.Length; i++)
                 allNames[i] = $"{i}. {RetainerData.GetName(list[i])} (Age {RetainerData.GetAge(list[i])})";
             selectedIndex = Mathf.Clamp(selectedIndex, -1, (list?.Count ?? 1) - 1);
-            scrollList = Vector2.zero;
-            scrollEdit = Vector2.zero;
         }
 
         private static void Apply()

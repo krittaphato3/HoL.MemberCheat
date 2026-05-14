@@ -17,6 +17,10 @@ using HorseUI = HoLMod.MemberCheat.Horse.HorseUI;
 using KingCityUI = HoLMod.MemberCheat.KingCity.KingCityUI;
 using VassalPrinceUI = HoLMod.MemberCheat.VassalPrince.VassalPrinceUI;
 using AttackPrefectureUI = HoLMod.MemberCheat.AttackPrefecture.AttackPrefectureUI;
+using OperaUI = HoLMod.MemberCheat.Opera.OperaUI;
+using PropUI = HoLMod.MemberCheat.Prop.PropUI;
+using HanMenUI = HoLMod.MemberCheat.HanMen.HanMenUI;
+using ZhuangTouUI = HoLMod.MemberCheat.ZhuangTou.ZhuangTouUI;
 using GameSettingsUI = HoLMod.MemberCheat.GameSettings.GameSettingsUI;
 
 namespace HoLMod.MemberCheat
@@ -26,18 +30,25 @@ namespace HoLMod.MemberCheat
         private bool showPanel = false;
         private Rect windowRect;
         private int selectedTab = 0;
-        private string[] tabNames = {
+        private static readonly string[] tabNames = {
             "Clan", "Spouses", "Retainers", "Other Clans", "Royal",
             "Farms", "Court", "Decrees", "Cities", "Fiefs",
             "Mines", "Camps", "Estates", "War Events", "Horses",
-            "Imp. Capital", "Vassal Princes", "Hostile Pref.", "Game"
+            "Imp. Capital", "Vassal Princes", "Hostile Pref.",
+            "Opera", "Items", "Civilians", "Farm Mgrs",
+            "Game"
         };
+        private const int TABS_PER_ROW = 12;
+        private const int TAB_WIDTH = 85;
+        private const int WINDOW_WIDTH = 1100;
+        private const int WINDOW_HEIGHT = 1000;
 
         private void Awake()
         {
-            float w = 1050f;
-            float h = 1000f;
-            windowRect = new Rect((Screen.width - w) / 2f, (Screen.height - h) / 2f, w, h);
+            windowRect = new Rect(
+                (Screen.width - WINDOW_WIDTH) / 2f,
+                (Screen.height - WINDOW_HEIGHT) / 2f,
+                WINDOW_WIDTH, WINDOW_HEIGHT);
         }
 
         private void Update()
@@ -71,32 +82,34 @@ namespace HoLMod.MemberCheat
                 case 15: KingCityUI.RequestRefresh(); break;
                 case 16: VassalPrinceUI.RequestRefresh(); break;
                 case 17: AttackPrefectureUI.RequestRefresh(); break;
+                case 18: OperaUI.RequestRefresh(); break;
+                case 19: PropUI.RequestRefresh(); break;
+                case 20: HanMenUI.RequestRefresh(); break;
+                case 21: ZhuangTouUI.RequestRefresh(); break;
             }
         }
 
         private void OnGUI()
         {
             if (!showPanel) return;
-            windowRect = GUI.Window(999, windowRect, DrawMainWindow, $"{ModInfo.Name} v{ModInfo.Version}");
+            windowRect = GUI.Window(999, windowRect, DrawMainWindow,
+                $"{ModInfo.Name} v{ModInfo.Version}  [F8]");
         }
 
         private void DrawMainWindow(int id)
         {
             GUILayout.BeginVertical();
 
-            // Two rows of 10 + 9 buttons
-            int cols = 10;
-            int rows = Mathf.CeilToInt(tabNames.Length / (float)cols);
+            int rows = Mathf.CeilToInt((float)tabNames.Length / TABS_PER_ROW);
             for (int r = 0; r < rows; r++)
             {
                 GUILayout.BeginHorizontal();
-                for (int c = 0; c < cols; c++)
+                for (int c = 0; c < TABS_PER_ROW; c++)
                 {
-                    int index = r * cols + c;
+                    int index = r * TABS_PER_ROW + c;
                     if (index >= tabNames.Length) break;
-
-                    GUI.enabled = (index != selectedTab);
-                    if (GUILayout.Button(tabNames[index], GUILayout.Width(95)))
+                    GUI.enabled = index != selectedTab;
+                    if (GUILayout.Button(tabNames[index], GUILayout.Width(TAB_WIDTH)))
                     {
                         selectedTab = index;
                         ForceRefreshCurrentTab();
@@ -128,7 +141,11 @@ namespace HoLMod.MemberCheat
                 case 15: KingCityUI.Draw(); break;
                 case 16: VassalPrinceUI.Draw(); break;
                 case 17: AttackPrefectureUI.Draw(); break;
-                case 18: GameSettingsUI.Draw(); break;
+                case 18: OperaUI.Draw(); break;
+                case 19: PropUI.Draw(); break;
+                case 20: HanMenUI.Draw(); break;
+                case 21: ZhuangTouUI.Draw(); break;
+                case 22: GameSettingsUI.Draw(); break;
             }
 
             GUILayout.EndVertical();

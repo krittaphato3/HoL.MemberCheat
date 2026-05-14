@@ -29,11 +29,7 @@ namespace HoLMod.MemberCheat.Farm
             if (needsRefresh) { Refresh(); needsRefresh = false; }
             if (allFarms == null) return;
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? flatFarms
@@ -59,7 +55,7 @@ namespace HoLMod.MemberCheat.Farm
         {
             string fName = FarmData.GetFarmName(farm);
             int size = FarmData.GetFarmSize(farm);
-            GUILayout.Label($"Farm: {fName} ({size} acres)", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold });
+            GUILayout.Label($"Farm: {fName} ({size} acres)", UIHelpers.BoldLabel);
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
             string[] labels = {
@@ -77,8 +73,12 @@ namespace HoLMod.MemberCheat.Farm
                 if (label == null) continue;
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"{label}:", GUILayout.Width(120));
-                string val = GUILayout.TextField(farm[i], GUILayout.Width(120));
-                if (val != farm[i]) farm[i] = val;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(farm[i]), GUILayout.Width(120));
+                if (val != farm[i])
+                {
+                    farm[i] = val;
+                    FarmData.SetFarmList(allFarms);
+                }
                 GUILayout.EndHorizontal();
             }
 
@@ -92,7 +92,6 @@ namespace HoLMod.MemberCheat.Farm
             allFarms = FarmData.GetFarmList();
             flatFarms.Clear();
             for (int r = 0; r < allFarms.Count; r++)
-            {
                 for (int f = 0; f < allFarms[r].Count; f++)
                 {
                     var farm = allFarms[r][f];
@@ -109,7 +108,6 @@ namespace HoLMod.MemberCheat.Farm
                         });
                     }
                 }
-            }
             selectedIndex = -1;
         }
     }

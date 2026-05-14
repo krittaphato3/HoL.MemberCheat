@@ -22,16 +22,12 @@ namespace HoLMod.MemberCheat.HanMen
             if (members == null) return;
 
             GUILayout.Label($"Civilians (HanMen) ({members.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? members.Select((m, i) => new { m, i }).ToList()
-                : members.Select((m, i) => new { m, i }).Where(x => HanMenData.GetName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                : members.Select((m, i) => new { m, i })
+                    .Where(x => HanMenData.GetName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
@@ -55,21 +51,20 @@ namespace HoLMod.MemberCheat.HanMen
         {
             string name = HanMenData.GetName(member);
             int age = HanMenData.GetAge(member);
-            GUILayout.Label($"Editing: {name} (Age {age})", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Editing: {name} (Age {age})", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
             for (int i = 0; i < member.Count; i++)
             {
-                string val = member[i];
-                string intVal = val;
-                if (float.TryParse(val, out float fv))
-                    intVal = Mathf.RoundToInt(fv).ToString();
-
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string newVal = GUILayout.TextField(intVal, GUILayout.Width(120));
-                if (newVal != intVal) member[i] = newVal;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(member[i]), GUILayout.Width(200));
+                if (val != member[i])
+                {
+                    member[i] = val;
+                    HanMenData.SetMembers(members);
+                }
                 GUILayout.EndHorizontal();
             }
 

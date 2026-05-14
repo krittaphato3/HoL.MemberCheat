@@ -1,15 +1,19 @@
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace HoLMod.MemberCheat.Estate
 {
     public static class EstateData
     {
-        // Fudi_now[estateID] -> List<string>
+        private const string FieldName = "Fudi_now";
+
         public static List<List<string>> GetEstates()
         {
-            var field = typeof(Mainload).GetField("Fudi_now", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-            return (field?.GetValue(null) as List<List<string>>) ?? new List<List<string>>();
+            return UIHelpers.GetStaticListField(FieldName);
+        }
+
+        public static void SetEstates(List<List<string>> list)
+        {
+            UIHelpers.WriteBackSetData(list, FieldName);
         }
 
         public static string GetEstateName(List<string> estate)

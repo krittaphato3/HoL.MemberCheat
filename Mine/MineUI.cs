@@ -21,16 +21,12 @@ namespace HoLMod.MemberCheat.Mine
             if (mines == null) return;
 
             GUILayout.Label($"Mines ({mines.Count})", GUI.skin.box);
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Search:", GUILayout.Width(50));
-            searchText = GUILayout.TextField(searchText, GUILayout.Width(120));
-            if (GUILayout.Button("Clear")) searchText = "";
-            GUILayout.EndHorizontal();
+            UIHelpers.SearchBar(ref searchText);
 
             var filtered = string.IsNullOrEmpty(searchText)
                 ? mines.Select((m, i) => new { m, i }).ToList()
-                : mines.Select((m, i) => new { m, i }).Where(x => MineData.GetMineName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
+                : mines.Select((m, i) => new { m, i })
+                    .Where(x => MineData.GetMineName(x.m).ToLower().Contains(searchText.ToLower())).ToList();
 
             scrollList = GUILayout.BeginScrollView(scrollList, GUILayout.Height(150));
             for (int j = 0; j < filtered.Count; j++)
@@ -52,7 +48,7 @@ namespace HoLMod.MemberCheat.Mine
         private static void DrawMineEdit(List<string> mine)
         {
             string name = MineData.GetMineName(mine);
-            GUILayout.Label($"Mine: {name}", new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold, fontSize = 13 });
+            GUILayout.Label($"Mine: {name}", UIHelpers.BoldLabel);
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
@@ -60,8 +56,12 @@ namespace HoLMod.MemberCheat.Mine
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(mine[i], GUILayout.Width(200));
-                if (val != mine[i]) mine[i] = val;
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(mine[i]), GUILayout.Width(200));
+                if (val != mine[i])
+                {
+                    mine[i] = val;
+                    MineData.SetMines(mines);
+                }
                 GUILayout.EndHorizontal();
             }
 
