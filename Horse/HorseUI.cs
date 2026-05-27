@@ -49,23 +49,7 @@ namespace HoLMod.MemberCheat.Horse
         {
             string name = HorseData.GetHorseName(horse);
             GUILayout.Label($"Horse: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < horse.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(horse[i]), GUILayout.Width(200));
-                if (val != horse[i])
-                {
-                    horse[i] = val;
-                    HorseData.SetHorses(horses);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

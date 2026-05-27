@@ -22,7 +22,8 @@ namespace HoLMod.MemberCheat.KingCity
 
             for (int i = 0; i < kingCity.Count; i++)
             {
-                string label = KingCityData.FieldLabels.ContainsKey(i) ? KingCityData.FieldLabels[i] : $"Field {i}";
+                if (!KingCityData.FieldLabels.ContainsKey(i)) continue;
+                string label = KingCityData.FieldLabels[i];
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"{label}:", GUILayout.Width(100));
                 string val = GUILayout.TextField(UIHelpers.GetDisplayValue(kingCity[i]), GUILayout.Width(300));

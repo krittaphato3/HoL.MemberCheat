@@ -49,23 +49,7 @@ namespace HoLMod.MemberCheat.Estate
         {
             string name = EstateData.GetEstateName(estate);
             GUILayout.Label($"Estate: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < estate.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(estate[i]), GUILayout.Width(200));
-                if (val != estate[i])
-                {
-                    estate[i] = val;
-                    EstateData.SetEstates(estates);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

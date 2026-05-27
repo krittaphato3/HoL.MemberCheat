@@ -49,23 +49,7 @@ namespace HoLMod.MemberCheat.VassalPrince
         {
             string name = VassalPrinceData.GetPrinceName(prince);
             GUILayout.Label($"Prince: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < prince.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(prince[i]), GUILayout.Width(200));
-                if (val != prince[i])
-                {
-                    prince[i] = val;
-                    VassalPrinceData.SetPrinces(princes);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

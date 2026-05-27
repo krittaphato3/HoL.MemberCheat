@@ -496,16 +496,23 @@ namespace HoLMod.MemberCheat.ClanMember
 
         private static void DrawExtraInternalFields(List<string> member)
         {
-            UIHelpers.Section("Extra Data");
+            UIHelpers.Section("Gameplay State");
             UIHelpers.TextField("Appearance", member, ClanMemberData.IDX_APPEARANCE, 120, 300, ApplyChanges);
             UIHelpers.TextField("Children IDs", member, ClanMemberData.IDX_CHILD_IDS, 120, 300, ApplyChanges);
             UIHelpers.TextField("Estate / School", member, ClanMemberData.IDX_ESTATE, 120, 300, ApplyChanges);
             UIHelpers.IntField("Status Duration", member, ClanMemberData.IDX_STATUS_DURATION, 60, ApplyChanges);
             UIHelpers.IntField("Book Progress", member, ClanMemberData.IDX_BOOK_PROGRESS, 60, ApplyChanges);
-            UIHelpers.TextField("Recent Events", member, ClanMemberData.IDX_RECENT_EVENTS, 120, 300, ApplyChanges);
+            UIHelpers.IntField("Preg. Cooldown", member, ClanMemberData.IDX_PREGNANCY_COOLDOWN, 60, ApplyChanges);
+            UIHelpers.IntField("Pills Consumed", member, ClanMemberData.IDX_PILLS, 60, ApplyChanges);
+            UIHelpers.IntField("Courtesans", member, ClanMemberData.IDX_COURTESANS, 60, ApplyChanges);
+
+            UIHelpers.Section("Equipment & Progression");
+            UIHelpers.TextField("Equipment", member, ClanMemberData.IDX_EQUIPMENT, 120, 300, ApplyChanges);
             UIHelpers.TextField("Basic Stat Gain", member, ClanMemberData.IDX_BASIC_STAT_GAIN, 120, 300, ApplyChanges);
             UIHelpers.TextField("School Values", member, ClanMemberData.IDX_SCHOOL_VALUES, 120, 300, ApplyChanges);
-            UIHelpers.IntField("Preg. Cooldown", member, ClanMemberData.IDX_PREGNANCY_COOLDOWN, 60, ApplyChanges);
+
+            UIHelpers.Section("Lore & Events");
+            UIHelpers.TextField("Recent Events", member, ClanMemberData.IDX_RECENT_EVENTS, 120, 300, ApplyChanges);
             UIHelpers.TextField("Biography", member, ClanMemberData.IDX_BIOGRAPHY, 100, 300, ApplyChanges);
         }
 

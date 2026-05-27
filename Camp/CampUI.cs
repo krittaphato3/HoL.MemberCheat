@@ -49,23 +49,7 @@ namespace HoLMod.MemberCheat.Camp
         {
             string name = CampData.GetCampName(camp);
             GUILayout.Label($"Camp: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < camp.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(camp[i]), GUILayout.Width(200));
-                if (val != camp[i])
-                {
-                    camp[i] = val;
-                    CampData.SetCamps(camps);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

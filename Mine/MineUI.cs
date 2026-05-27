@@ -49,23 +49,7 @@ namespace HoLMod.MemberCheat.Mine
         {
             string name = MineData.GetMineName(mine);
             GUILayout.Label($"Mine: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < mine.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(mine[i]), GUILayout.Width(200));
-                if (val != mine[i])
-                {
-                    mine[i] = val;
-                    MineData.SetMines(mines);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

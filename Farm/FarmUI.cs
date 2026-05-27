@@ -62,23 +62,44 @@ namespace HoLMod.MemberCheat.Farm
                 "Ownership", null, "Fertility", null, "Location",
                 "Size (acres)", "Name", "Population", null, null,
                 "Environment", "Security", "Convenience", null, "Production",
-                null, "Manager Key", null, null, "Young Trees 2yr",
-                null, "Young Trees 4yr", "Young Trees 5yr", null, "Workers Total",
+                null, "Manager Key", null, null, "Young Trees (2yr)",
+                null, "Young Trees (4yr)", "Young Trees (5yr)", null, "Workers Total",
                 null, "Idle Workers"
             };
 
-            for (int i = 0; i < farm.Count; i++)
+            UIHelpers.Section("General");
+            for (int i = 0; i < farm.Count && i <= 8; i++)
             {
                 string label = (i < labels.Length) ? labels[i] : null;
                 if (label == null) continue;
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"{label}:", GUILayout.Width(120));
                 string val = GUILayout.TextField(UIHelpers.GetDisplayValue(farm[i]), GUILayout.Width(120));
-                if (val != farm[i])
-                {
-                    farm[i] = val;
-                    FarmData.SetFarmList(allFarms);
-                }
+                if (val != farm[i]) { farm[i] = val; FarmData.SetFarmList(allFarms); }
+                GUILayout.EndHorizontal();
+            }
+
+            UIHelpers.Section("Conditions");
+            for (int i = 10; i < farm.Count && i <= 15; i++)
+            {
+                string label = (i < labels.Length) ? labels[i] : null;
+                if (label == null) continue;
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"{label}:", GUILayout.Width(120));
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(farm[i]), GUILayout.Width(120));
+                if (val != farm[i]) { farm[i] = val; FarmData.SetFarmList(allFarms); }
+                GUILayout.EndHorizontal();
+            }
+
+            UIHelpers.Section("Workforce & Trees");
+            for (int i = 16; i < farm.Count; i++)
+            {
+                string label = (i < labels.Length) ? labels[i] : null;
+                if (label == null) continue;
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"{label}:", GUILayout.Width(120));
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(farm[i]), GUILayout.Width(120));
+                if (val != farm[i]) { farm[i] = val; FarmData.SetFarmList(allFarms); }
                 GUILayout.EndHorizontal();
             }
 

@@ -54,7 +54,8 @@ namespace HoLMod.MemberCheat.Court
 
             for (int i = 0; i < minister.Count; i++)
             {
-                string label = CourtData.FieldLabels.ContainsKey(i) ? CourtData.FieldLabels[i] : $"Field {i}";
+                if (!CourtData.FieldLabels.ContainsKey(i)) continue;
+                string label = CourtData.FieldLabels[i];
                 GUILayout.BeginHorizontal();
                 GUILayout.Label($"{label}:", GUILayout.Width(100));
                 string val = GUILayout.TextField(minister[i], GUILayout.Width(200));

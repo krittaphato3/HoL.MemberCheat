@@ -56,23 +56,7 @@ namespace HoLMod.MemberCheat.City
         {
             string name = CityData.GetCityName(city);
             GUILayout.Label($"City: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < city.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(city[i]), GUILayout.Width(200));
-                if (val != city[i])
-                {
-                    city[i] = val;
-                    CityData.SetCities(allCities);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

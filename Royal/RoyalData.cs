@@ -8,6 +8,64 @@ namespace HoLMod.MemberCheat.Royal
         private const string Field_Members = "Member_King";
         private const string Field_Spouses = "Member_King_qu";
 
+        // Member_King line indices (per doc spec)
+        public const int IDX_PERSON_KEY = 0;
+        public const int IDX_APPEARANCE = 1;
+        public const int IDX_COMPOSITE = 2;
+        public const int IDX_AGE = 3;
+        public const int IDX_WRITING = 4;
+        public const int IDX_MIGHT = 5;
+        public const int IDX_BUSINESS = 6;
+        public const int IDX_ARTS = 7;
+        public const int IDX_MOOD = 8;
+        public const int IDX_RENOWN = 16;
+        public const int IDX_CHARISMA = 18;
+        public const int IDX_HEALTH = 19;
+        public const int IDX_CUNNING = 21;
+
+        // Lines that are internal/fixed values - hidden from UI
+        public static readonly HashSet<int> HiddenIndices = new HashSet<int> { 11, 12, 17, 24, 27, 28 };
+
+        // Composite sub-indices (line 2: Name|Hobby|Talent|TalentVal|Gender|Lifespan|Skill|Luck|Personality|ParentPK)
+        public const int SUB_NAME = 0;
+        public const int SUB_HOBBY = 1;
+        public const int SUB_TALENT_TYPE = 2;
+        public const int SUB_TALENT_VALUE = 3;
+        public const int SUB_GENDER = 4;
+        public const int SUB_LIFESPAN = 5;
+        public const int SUB_SKILL_TYPE = 6;
+        public const int SUB_LUCK = 7;
+        public const int SUB_PERSONALITY = 8;
+        public const int SUB_PARENT_PK = 9;
+
+        public static readonly Dictionary<int, string> FieldLabels = new Dictionary<int, string>
+        {
+            {IDX_PERSON_KEY, "Person Key"},
+            {IDX_APPEARANCE, "Appearance"},
+            {IDX_AGE, "Age"},
+            {IDX_WRITING, "Writing"},
+            {IDX_MIGHT, "Might"},
+            {IDX_BUSINESS, "Business"},
+            {IDX_ARTS, "Arts"},
+            {IDX_MOOD, "Mood"},
+            {IDX_RENOWN, "Renown"},
+            {IDX_CHARISMA, "Charisma"},
+            {IDX_HEALTH, "Health"},
+            {IDX_CUNNING, "Cunning"},
+            {9, "Empire Position"},
+            {10, "Fief Title"},
+            {13, "Children"},
+            {14, "Relationship"},
+            {15, "Status"},
+            {20, "Marriage"},
+            {22, "Stat Gain"},
+            {23, "Skill Value"},
+            {25, "Biography"},
+            {26, "Traits"},
+            {29, "Royal Teacher"},
+            {30, "Teacher Gain"},
+        };
+
         public static List<List<string>> GetMembers()
         {
             return UIHelpers.GetStaticListField(Field_Members);
@@ -27,16 +85,6 @@ namespace HoLMod.MemberCheat.Royal
         {
             UIHelpers.WriteBackSetData(list, Field_Spouses);
         }
-
-        public const int IDX_COMPOSITE = 2;
-        public const int SUB_NAME = 0;
-        public const int SUB_TALENT_TYPE = 2;
-        public const int SUB_TALENT_VALUE = 3;
-        public const int SUB_GENDER = 4;
-        public const int SUB_SKILL_TYPE = 5;
-        public const int SUB_LUCK = 6;
-        public const int SUB_PERSONALITY = 7;
-        public const int SUB_HOBBY = 9;
 
         public static string[] GetCompositeParts(List<string> member)
         {
@@ -80,6 +128,11 @@ namespace HoLMod.MemberCheat.Royal
         {
             if (member != null && member.Count > 3 && int.TryParse(member[3], out int a)) return a;
             return -1;
+        }
+
+        public static string GetFieldLabel(int idx)
+        {
+            return FieldLabels.TryGetValue(idx, out string label) ? label : null;
         }
     }
 }

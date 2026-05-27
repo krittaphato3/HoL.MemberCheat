@@ -49,23 +49,7 @@ namespace HoLMod.MemberCheat.Prop
         {
             string name = PropData.GetPropName(prop);
             GUILayout.Label($"Item: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < prop.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(prop[i]), GUILayout.Width(200));
-                if (val != prop[i])
-                {
-                    prop[i] = val;
-                    PropData.SetProps(props);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

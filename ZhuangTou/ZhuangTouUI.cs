@@ -59,23 +59,7 @@ namespace HoLMod.MemberCheat.ZhuangTou
             string name = ZhuangTouData.GetManagerName(manager);
             int age = ZhuangTouData.GetAge(manager);
             GUILayout.Label($"Manager: {name} (Age {age})", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < manager.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(manager[i]), GUILayout.Width(200));
-                if (val != manager[i])
-                {
-                    manager[i] = val;
-                    ZhuangTouData.SetManagers(allManagers);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

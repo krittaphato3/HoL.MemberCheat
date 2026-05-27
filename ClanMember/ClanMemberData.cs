@@ -39,7 +39,12 @@ namespace HoLMod.MemberCheat.ClanMember
         public const int IDX_PREGNANCY_COOLDOWN = 34;
         public const int IDX_BIOGRAPHY = 36;
         public const int IDX_STUDY_SCHOOL = 40;
+        public const int IDX_EQUIPMENT = 29;
+        public const int IDX_PILLS = 35;
+        public const int IDX_COURTESANS = 39;
         public const int IDX_CLAN_DUTY = 41;
+
+        public static readonly HashSet<int> HiddenIndices = new HashSet<int> { 17, 28, 37, 38 };
 
         public const int SUB_NAME = 0;
         public const int SUB_GENERATION = 1;

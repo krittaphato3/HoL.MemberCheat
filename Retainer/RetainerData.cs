@@ -16,9 +16,10 @@ namespace HoLMod.MemberCheat.Retainer
         public const int IDX_BUSINESS = 6;
         public const int IDX_ARTS = 7;
         public const int IDX_MOOD = 8;
-        public const int IDX_TEACHING = 9;
+        public const int IDX_CLAN_DUTY = 9;
         public const int IDX_STATUS = 10;
         public const int IDX_RENOWN = 11;
+        public const int IDX_STATUS_DURATION = 12;
         public const int IDX_CHARISMA = 13;
         public const int IDX_HEALTH = 14;
         public const int IDX_CUNNING = 15;
@@ -41,11 +42,11 @@ namespace HoLMod.MemberCheat.Retainer
         {
             {IDX_ID, "ID"}, {IDX_APPEARANCE, "Appearance"}, {IDX_AGE, "Age"},
             {IDX_WRITING, "Writing"}, {IDX_MIGHT, "Might"}, {IDX_BUSINESS, "Business"},
-            {IDX_ARTS, "Arts"}, {IDX_MOOD, "Mood"}, {IDX_TEACHING, "Teaching"},
-            {IDX_STATUS, "Status"}, {IDX_RENOWN, "Renown"}, {IDX_CHARISMA, "Charisma"},
-            {IDX_HEALTH, "Health"}, {IDX_CUNNING, "Cunning"}, {IDX_SKILL_POINTS, "Skill Points"},
-            {IDX_PREGNANCY, "Pregnancy"}, {IDX_SALARY, "Salary"}, {IDX_STAMINA, "Stamina"},
-            {IDX_SPECIAL_TAG, "Special Tag"}
+            {IDX_ARTS, "Arts"}, {IDX_MOOD, "Mood"}, {IDX_CLAN_DUTY, "Clan Duty"},
+            {IDX_STATUS, "Status"}, {IDX_RENOWN, "Renown"}, {IDX_STATUS_DURATION, "Status Duration"},
+            {IDX_CHARISMA, "Charisma"}, {IDX_HEALTH, "Health"}, {IDX_CUNNING, "Cunning"},
+            {IDX_SKILL_POINTS, "Skill Points"}, {IDX_PREGNANCY, "Pregnancy"}, {IDX_SALARY, "Salary"},
+            {IDX_STAMINA, "Stamina"}, {IDX_SPECIAL_TAG, "Special Tag"}
         };
 
         public static List<List<string>> GetList()

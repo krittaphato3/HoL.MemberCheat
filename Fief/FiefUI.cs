@@ -49,23 +49,7 @@ namespace HoLMod.MemberCheat.Fief
         {
             string name = FiefData.GetFiefName(fief);
             GUILayout.Label($"Fief: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < fief.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(fief[i]), GUILayout.Width(200));
-                if (val != fief[i])
-                {
-                    fief[i] = val;
-                    FiefData.SetFiefs(fiefs);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

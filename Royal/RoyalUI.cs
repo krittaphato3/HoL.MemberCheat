@@ -71,6 +71,22 @@ namespace HoLMod.MemberCheat.Royal
             DrawStats(member);
             DrawRankEditor(member);
 
+            UIHelpers.Section("Extra Data");
+            for (int i = 0; i < member.Count; i++)
+            {
+                if (RoyalData.HiddenIndices.Contains(i)) continue;
+                if (i == RoyalData.IDX_COMPOSITE || i == RoyalData.IDX_AGE) continue;
+                if (i >= RoyalData.IDX_WRITING && i <= RoyalData.IDX_ARTS) continue;
+                if (i == RoyalData.IDX_MOOD || i == RoyalData.IDX_RENOWN || i == RoyalData.IDX_HEALTH) continue;
+                string label = RoyalData.GetFieldLabel(i);
+                if (label == null) continue;
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"{label}:", GUILayout.Width(100));
+                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(member[i]), GUILayout.Width(200));
+                if (val != member[i]) { member[i] = val; }
+                GUILayout.EndHorizontal();
+            }
+
             GUILayout.EndScrollView();
         }
 
@@ -82,11 +98,11 @@ namespace HoLMod.MemberCheat.Royal
             if (nameField != RoyalData.GetCompositeSub(member, RoyalData.SUB_NAME))
                 RoyalData.SetCompositeSub(member, RoyalData.SUB_NAME, nameField);
             GUILayout.Label("Age:", GUILayout.Width(35));
-            string ageStr = GUILayout.TextField(member[3], GUILayout.Width(40));
-            if (ageStr != member[3] && int.TryParse(ageStr, out int na))
-                member[3] = na.ToString();
-            if (GUILayout.Button("-1")) { int.TryParse(member[3], out int a); member[3] = Math.Max(0, a - 1).ToString(); }
-            if (GUILayout.Button("+1")) { int.TryParse(member[3], out int a); member[3] = (a + 1).ToString(); }
+            string ageStr = GUILayout.TextField(member[RoyalData.IDX_AGE], GUILayout.Width(40));
+            if (ageStr != member[RoyalData.IDX_AGE] && int.TryParse(ageStr, out int na))
+                member[RoyalData.IDX_AGE] = na.ToString();
+            if (GUILayout.Button("-1")) { int.TryParse(member[RoyalData.IDX_AGE], out int a); member[RoyalData.IDX_AGE] = Math.Max(0, a - 1).ToString(); }
+            if (GUILayout.Button("+1")) { int.TryParse(member[RoyalData.IDX_AGE], out int a); member[RoyalData.IDX_AGE] = (a + 1).ToString(); }
             GUILayout.EndHorizontal();
         }
 
@@ -152,12 +168,16 @@ namespace HoLMod.MemberCheat.Royal
             for (int i = 4; i <= 7 && i < member.Count; i++)
                 UIHelpers.FloatFieldWithButtons(labels[i - 4], member, i, 100);
 
-            if (member.Count > 8)
-                UIHelpers.FloatFieldWithButtons("Mood", member, 8, 100);
-            if (member.Count > 16)
-                UIHelpers.FloatFieldWithButtons("Renown", member, 16, 100);
-            if (member.Count > 19)
-                UIHelpers.FloatFieldWithButtons("Health", member, 19, 100);
+            if (member.Count > RoyalData.IDX_MOOD)
+                UIHelpers.FloatFieldWithButtons("Mood", member, RoyalData.IDX_MOOD, 100);
+            if (member.Count > RoyalData.IDX_RENOWN)
+                UIHelpers.FloatFieldWithButtons("Renown", member, RoyalData.IDX_RENOWN, 100);
+            if (member.Count > RoyalData.IDX_CHARISMA)
+                UIHelpers.FloatFieldWithButtons("Charisma", member, RoyalData.IDX_CHARISMA, 100);
+            if (member.Count > RoyalData.IDX_HEALTH)
+                UIHelpers.FloatFieldWithButtons("Health", member, RoyalData.IDX_HEALTH, 100);
+            if (member.Count > RoyalData.IDX_CUNNING)
+                UIHelpers.FloatFieldWithButtons("Cunning", member, RoyalData.IDX_CUNNING, 100);
         }
 
         private static void DrawRankEditor(List<string> member)
@@ -199,10 +219,12 @@ namespace HoLMod.MemberCheat.Royal
 
         private static void MaxAll(List<string> member)
         {
-            for (int i = 4; i <= 7 && i < member.Count; i++) member[i] = "100";
-            if (member.Count > 8) member[8] = "100";
-            if (member.Count > 16) member[16] = "100";
-            if (member.Count > 19) member[19] = "100";
+            for (int i = RoyalData.IDX_WRITING; i <= RoyalData.IDX_ARTS && i < member.Count; i++) member[i] = "100";
+            if (member.Count > RoyalData.IDX_MOOD) member[RoyalData.IDX_MOOD] = "100";
+            if (member.Count > RoyalData.IDX_RENOWN) member[RoyalData.IDX_RENOWN] = "100";
+            if (member.Count > RoyalData.IDX_CHARISMA) member[RoyalData.IDX_CHARISMA] = "100";
+            if (member.Count > RoyalData.IDX_HEALTH) member[RoyalData.IDX_HEALTH] = "100";
+            if (member.Count > RoyalData.IDX_CUNNING) member[RoyalData.IDX_CUNNING] = "100";
             RoyalData.SetCompositeSub(member, RoyalData.SUB_LUCK, "100");
             RoyalData.SetCompositeSub(member, RoyalData.SUB_TALENT_VALUE, "100");
         }
@@ -217,10 +239,12 @@ namespace HoLMod.MemberCheat.Royal
                     member[i] = Mathf.Clamp(Mathf.RoundToInt(f) + 10, 0, 100).ToString();
                 }
             }
-            for (int i = 4; i <= 7; i++) BoostIdx(i);
-            BoostIdx(8);
-            BoostIdx(16);
-            BoostIdx(19);
+            for (int i = RoyalData.IDX_WRITING; i <= RoyalData.IDX_ARTS; i++) BoostIdx(i);
+            BoostIdx(RoyalData.IDX_MOOD);
+            BoostIdx(RoyalData.IDX_RENOWN);
+            BoostIdx(RoyalData.IDX_CHARISMA);
+            BoostIdx(RoyalData.IDX_HEALTH);
+            BoostIdx(RoyalData.IDX_CUNNING);
         }
 
         private static void Refresh()

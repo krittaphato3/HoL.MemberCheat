@@ -171,8 +171,11 @@ namespace HoLMod.MemberCheat.Retainer
             if (member.Count > RetainerData.IDX_SALARY)
                 UIHelpers.IntFieldWithButtons("Salary", member, RetainerData.IDX_SALARY, 999999, Apply);
 
-            if (member.Count > RetainerData.IDX_TEACHING)
-                UIHelpers.FloatFieldWithButtons("Teaching", member, RetainerData.IDX_TEACHING, 100, Apply);
+            if (member.Count > RetainerData.IDX_CLAN_DUTY)
+                UIHelpers.TextField("Clan Duty", member, RetainerData.IDX_CLAN_DUTY, 80, 200, Apply);
+
+            if (member.Count > RetainerData.IDX_STATUS_DURATION)
+                UIHelpers.IntField("Status Duration", member, RetainerData.IDX_STATUS_DURATION, 60, Apply);
         }
 
         private static void DrawStatusEditor(List<string> member)

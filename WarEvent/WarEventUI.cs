@@ -49,23 +49,7 @@ namespace HoLMod.MemberCheat.WarEvent
         {
             string name = WarEventData.GetEventName(warEvent);
             GUILayout.Label($"Event: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < warEvent.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(warEvent[i]), GUILayout.Width(200));
-                if (val != warEvent[i])
-                {
-                    warEvent[i] = val;
-                    WarEventData.SetWarEvents(warEvents);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()

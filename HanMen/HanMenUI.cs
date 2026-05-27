@@ -55,20 +55,73 @@ namespace HoLMod.MemberCheat.HanMen
 
             scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
 
-            for (int i = 0; i < member.Count; i++)
+            UIHelpers.Section("Basic Info");
+            DrawStatField(member, HanMenData.IDX_PERSON_KEY, "Person Key");
+            DrawTextField(member, HanMenData.IDX_APPEARANCE, "Appearance");
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Name:", GUILayout.Width(80));
+            var parts = member.Count > HanMenData.IDX_COMPOSITE ? member[HanMenData.IDX_COMPOSITE].Split('|') : new string[0];
+            string curName = parts.Length > 0 ? parts[0] : "";
+            string newName = GUILayout.TextField(curName, GUILayout.Width(200));
+            if (newName != curName)
             {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(member[i]), GUILayout.Width(200));
-                if (val != member[i])
-                {
-                    member[i] = val;
-                    HanMenData.SetMembers(members);
-                }
-                GUILayout.EndHorizontal();
+                parts[0] = newName;
+                member[HanMenData.IDX_COMPOSITE] = string.Join("|", parts);
+                HanMenData.SetMembers(members);
             }
+            GUILayout.EndHorizontal();
+
+            DrawStatField(member, HanMenData.IDX_AGE, "Age");
+
+            UIHelpers.Section("Stats");
+            DrawStatField(member, HanMenData.IDX_WRITING, "Writing");
+            DrawStatField(member, HanMenData.IDX_MIGHT, "Might");
+            DrawStatField(member, HanMenData.IDX_BUSINESS, "Business");
+            DrawStatField(member, HanMenData.IDX_ARTS, "Arts");
+            DrawStatField(member, HanMenData.IDX_MOOD, "Mood");
+            DrawStatField(member, HanMenData.IDX_RENOWN, "Renown");
+            DrawStatField(member, HanMenData.IDX_CHARISMA, "Charisma");
+            DrawStatField(member, HanMenData.IDX_HEALTH, "Health");
+            DrawStatField(member, HanMenData.IDX_CUNNING, "Cunning");
+
+            UIHelpers.Section("Position & Progression");
+            DrawTextField(member, HanMenData.IDX_EMPIRE_POSITION, "Empire Position");
+            DrawTextField(member, HanMenData.IDX_SCHOLARSHIP, "Scholarship");
+            DrawTextField(member, HanMenData.IDX_FIEF_TITLE, "Fief Title");
+            DrawTextField(member, HanMenData.IDX_STATUS, "Status");
+            DrawTextField(member, HanMenData.IDX_STAT_GAIN, "Stat Gain");
+            DrawTextField(member, HanMenData.IDX_SCHOOL, "School");
 
             GUILayout.EndScrollView();
+        }
+
+        private static void DrawStatField(List<string> member, int idx, string label)
+        {
+            if (idx >= member.Count) return;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"{label}:", GUILayout.Width(100));
+            string val = GUILayout.TextField(UIHelpers.GetDisplayValue(member[idx]), GUILayout.Width(120));
+            if (val != member[idx])
+            {
+                member[idx] = val;
+                HanMenData.SetMembers(members);
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        private static void DrawTextField(List<string> member, int idx, string label)
+        {
+            if (idx >= member.Count) return;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"{label}:", GUILayout.Width(100));
+            string val = GUILayout.TextField(member[idx], GUILayout.Width(200));
+            if (val != member[idx])
+            {
+                member[idx] = val;
+                HanMenData.SetMembers(members);
+            }
+            GUILayout.EndHorizontal();
         }
 
         private static void Refresh()

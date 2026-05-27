@@ -49,23 +49,7 @@ namespace HoLMod.MemberCheat.Decree
         {
             string name = DecreeData.GetDecreeName(decree);
             GUILayout.Label($"Editing: {name}", UIHelpers.BoldLabel);
-
-            scrollEdit = GUILayout.BeginScrollView(scrollEdit, GUILayout.Height(500));
-
-            for (int i = 0; i < decree.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"Field {i}:", GUILayout.Width(80));
-                string val = GUILayout.TextField(UIHelpers.GetDisplayValue(decree[i]), GUILayout.Width(200));
-                if (val != decree[i])
-                {
-                    decree[i] = val;
-                    DecreeData.SetDecrees(decrees);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
+            GUILayout.Label("No documented editable fields available for this data type.");
         }
 
         private static void Refresh()
